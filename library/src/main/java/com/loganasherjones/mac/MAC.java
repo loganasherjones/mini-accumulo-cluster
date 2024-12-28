@@ -86,6 +86,7 @@ public class MAC implements AccumuloCluster {
             return;
         }
 
+        log.info("Starting Mini Accumulo Cluster");
         config.createDirectoryStructure();
 
         ensureStopIsCalled();
@@ -101,21 +102,23 @@ public class MAC implements AccumuloCluster {
 
     @Override
     public void stop() throws IOException, InterruptedException {
+        // TODO: Add thread-safeness here.
         log.debug("Flushing log writers...");
         for (LogWriter lw : logWriters) {
             lw.flush();
         }
 
-        log.info("Stopping MAC...");
+        log.info("Stopping Mini Accumulo Cluster");
+        log.debug("Stopping {} MAC processes...", processes.size());
         for (Map.Entry<String, Process> entry: processes.entrySet()) {
-            log.info("Stopping '{}' process", entry.getKey());
+            log.debug("Stopping '{}' process", entry.getKey());
             Process p = entry.getValue();
             p.destroy();
             log.debug("Waiting for '{}' process to stop.", entry.getKey());
             p.waitFor();
             log.debug("Process '{}' successfully stopped.", entry.getKey());
         }
-        log.info("Done stopping MAC.");
+        log.info("Mini Accumulo Cluster stopped.");
     }
 
     @Override
@@ -151,8 +154,6 @@ public class MAC implements AccumuloCluster {
         argList.add(className);
         argList.add(config.getZooCfgFile().getAbsolutePath());
 
-        String foo = String.join(" ", argList);
-        log.info(foo);
         ProcessBuilder builder = new ProcessBuilder(argList);
 
         Process process = builder.start();
