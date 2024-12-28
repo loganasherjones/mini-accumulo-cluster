@@ -85,6 +85,7 @@ public class MAC implements AccumuloCluster {
             log.warn("start called on an already started MAC.");
             return;
         }
+        // TODO: Add thread safeness here
 
         log.info("Starting Mini Accumulo Cluster");
         config.createDirectoryStructure();
