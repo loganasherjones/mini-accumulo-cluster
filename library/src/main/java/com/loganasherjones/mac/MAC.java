@@ -10,10 +10,17 @@ import org.apache.accumulo.core.client.Instance;
 import org.apache.accumulo.core.client.ZooKeeperInstance;
 import org.apache.accumulo.core.client.security.tokens.AuthenticationToken;
 import org.apache.accumulo.core.conf.AccumuloConfiguration;
+import org.apache.accumulo.core.master.thrift.MasterGoalState;
+import org.apache.accumulo.gc.SimpleGarbageCollector;
+import org.apache.accumulo.master.Master;
+import org.apache.accumulo.master.state.SetGoalState;
 import org.apache.accumulo.minicluster.impl.ZooKeeperBindException;
+import org.apache.accumulo.server.init.Initialize;
+import org.apache.accumulo.tserver.TabletServer;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.zookeeper.server.ZooKeeperServerMain;
+import org.mortbay.util.IO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +59,7 @@ public class MAC implements AccumuloCluster {
 
     @Override
     public String getZooKeepers() {
-        return "";
+        return config.getZooKeeperHost() + ":" + config.getZooKeeperPort();
     }
 
     @Override
@@ -64,7 +71,7 @@ public class MAC implements AccumuloCluster {
     @Override
     public ClientConfiguration getClientConfig() {
         return ClientConfiguration
-                .fromMap(new HashMap<>())
+                .fromMap(config.getSiteConfig())
                 .withInstance(this.getInstanceName())
                 .withZkHosts(this.getZooKeepers());
     }
@@ -92,11 +99,11 @@ public class MAC implements AccumuloCluster {
 
         ensureStopIsCalled();
         ensureZookeeperIsRunning();
-//        initializeAccumulo();
-//        startTabletServers();
-//        setManagerGoalState();
-//        startManager();
-//        startGarbageCollector();
+        initializeAccumulo();
+        startTabletServers();
+        setManagerGoalState();
+        startManager();
+        startGarbageCollector();
 
         initialized = true;
     }
@@ -133,8 +140,110 @@ public class MAC implements AccumuloCluster {
     }
 
     private void ensureZookeeperIsRunning() throws IOException, InterruptedException {
+        // TODO: Allow user to specify an existing zookeeper
         startZookeeperProcess();
         waitForZookeeperToBeOk();
+    }
+
+    private void startGarbageCollector() throws IOException, InterruptedException {
+        // TODO: Add support for multiple tablet servers.
+        String javaHome = System.getProperty("java.home");
+        String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
+        String classpath = config.getClasspathLoader().getClasspath();
+        String className = SimpleGarbageCollector.class.getName();
+
+        String processName = "mac-" + config.getMACId() + "-gc";
+        List<String> argList = new ArrayList<>(Arrays.asList(javaBin, "-Dproc=" + processName, "-cp", classpath));
+
+//        List<String> jvmOpts = new ArrayList<>();
+
+        // TODO: Allow the user to specify JVM Opts from the config.
+//        argList.addAll(jvmOpts);
+
+        argList.add(className);
+//        argList.add(config.getZooCfgFile().getAbsolutePath());
+
+        ProcessBuilder builder = new ProcessBuilder(argList);
+
+        Process process = builder.start();
+        processes.put(processName, process);
+        captureOutput(processName, process);
+    }
+
+
+    private void startManager() throws IOException, InterruptedException {
+        // TODO: Add support for multiple tablet servers.
+        String javaHome = System.getProperty("java.home");
+        String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
+        String classpath = config.getClasspathLoader().getClasspath();
+        String className = Master.class.getName();
+
+        String processName = "mac-" + config.getMACId() + "-manager";
+        List<String> argList = new ArrayList<>(Arrays.asList(javaBin, "-Dproc=" + processName, "-cp", classpath));
+
+//        List<String> jvmOpts = new ArrayList<>();
+
+        // TODO: Allow the user to specify JVM Opts from the config.
+//        argList.addAll(jvmOpts);
+
+        argList.add(className);
+//        argList.add(config.getZooCfgFile().getAbsolutePath());
+
+        ProcessBuilder builder = new ProcessBuilder(argList);
+
+        Process process = builder.start();
+        processes.put(processName, process);
+        captureOutput(processName, process);
+    }
+
+    private void setManagerGoalState() throws IOException, InterruptedException {
+        String javaHome = System.getProperty("java.home");
+        String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
+        String classpath = config.getClasspathLoader().getClasspath();
+        String className = SetGoalState.class.getName();
+
+        String processName =  "mac-" + config.getMACId() + "-accumulo-manager-state";
+        List<String> argList = new ArrayList<>(Arrays.asList(javaBin, "-Dproc=" + processName, "-cp", classpath));
+
+        // TODO: Allow the user to specify JVM Opts from the config.
+        argList.add(className);
+        argList.add(MasterGoalState.NORMAL.toString());
+
+        ProcessBuilder builder = new ProcessBuilder(argList);
+        log.info("Setting accumulo manager goal state.");
+        log.info(String.join(" ", argList));
+        Process process = builder.start();
+        captureOutput(processName, process);
+        int retCode = process.waitFor();
+        if (retCode != 0) {
+            log.error("Error setting manager goal state.");
+            throw new RuntimeException("Error setting manager goal state.");
+        }
+
+    }
+    private void startTabletServers() throws IOException {
+        // TODO: Add support for multiple tablet servers.
+        String javaHome = System.getProperty("java.home");
+        String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
+        String classpath = config.getClasspathLoader().getClasspath();
+        String className = TabletServer.class.getName();
+
+        String processName = "mac-" + config.getMACId() + "-tserver";
+        List<String> argList = new ArrayList<>(Arrays.asList(javaBin, "-Dproc=" + processName, "-cp", classpath));
+
+//        List<String> jvmOpts = new ArrayList<>();
+
+        // TODO: Allow the user to specify JVM Opts from the config.
+//        argList.addAll(jvmOpts);
+
+        argList.add(className);
+//        argList.add(config.getZooCfgFile().getAbsolutePath());
+
+        ProcessBuilder builder = new ProcessBuilder(argList);
+
+        Process process = builder.start();
+        processes.put(processName, process);
+        captureOutput(processName, process);
     }
 
     private void startZookeeperProcess() throws IOException {
@@ -160,6 +269,38 @@ public class MAC implements AccumuloCluster {
         Process process = builder.start();
         processes.put(processName, process);
         captureOutput(processName, process);
+    }
+
+
+    private void initializeAccumulo() throws IOException, InterruptedException {
+        String javaHome = System.getProperty("java.home");
+        String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
+        String classpath = config.getClasspathLoader().getClasspath();
+        String className = Initialize.class.getName();
+
+        String processName =  "mac-" + config.getMACId() + "-accumulo-init";
+        List<String> argList = new ArrayList<>(Arrays.asList(javaBin, "-Dproc=" + processName, "-cp", classpath));
+
+        // TODO: Allow the user to specify JVM Opts from the config.
+        argList.add(className);
+        argList.add("--instance-name");
+        argList.add(config.getInstanceName());
+        argList.add("--user");
+        argList.add("root");
+        argList.add("--clear-instance-name");
+        argList.add("--password");
+        argList.add(config.getRootPassword());
+
+        ProcessBuilder builder = new ProcessBuilder(argList);
+        log.info("Running accumulo init.");
+        log.info(String.join(" ", argList));
+        Process process = builder.start();
+        captureOutput(processName, process);
+        int retCode = process.waitFor();
+        if (retCode != 0) {
+            log.error("Error initializing accumulo.");
+            throw new RuntimeException("Error initializing accumulo.");
+        }
     }
 
     private void ensureStopIsCalled() {

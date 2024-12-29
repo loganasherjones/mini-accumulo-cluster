@@ -18,24 +18,23 @@ public class DefaultClasspathLoader implements ClasspathLoader {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultClasspathLoader.class);
 
-    private final List<String> staticClasspath;
+    private final List<String> extraClasspath;
 
-    public DefaultClasspathLoader(List<String> staticClasspath) {
-        this.staticClasspath = staticClasspath;
+    public DefaultClasspathLoader(List<String> extraClasspath) {
+        this.extraClasspath = extraClasspath;
     }
 
     public String getClasspath() throws IOException {
         StringBuilder classpathBuilder = new StringBuilder();
-
-        if (this.staticClasspath == null || this.staticClasspath.isEmpty()) {
-            appendDefaultClasspath(classpathBuilder, getClassLoaders());
-        } else {
-            for (String s : staticClasspath) {
+        appendDefaultClasspath(classpathBuilder, getClassLoaders());
+        if (this.extraClasspath != null && !this.extraClasspath.isEmpty()) {
+            for (String s : extraClasspath) {
                 classpathBuilder.append(File.pathSeparator).append(s);
             }
         }
 
         String classpath = classpathBuilder.toString();
+        log.trace("Classpath for spawned processes:");
         log.trace(classpath);
         return classpath;
     }
