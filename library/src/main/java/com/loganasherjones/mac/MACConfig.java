@@ -126,6 +126,7 @@ public class MACConfig {
         zooCfg.setProperty("dataDir", configDirectory.getAbsolutePath());
         zooCfg.setProperty("tickTime", "2000");
         zooCfg.setProperty("maxClientCnxns", "1000");
+        zooCfg.setProperty("4lw.commands.whitelist", "*");
         zooCfg.store(fw, null);
 
         File siteXml = new File(configDirectory, "accumulo-site.xml");
