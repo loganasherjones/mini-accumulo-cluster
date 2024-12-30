@@ -1,15 +1,11 @@
 package com.loganasherjones.mac;
 
-import org.apache.accumulo.cluster.AccumuloCluster;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.client.security.tokens.PasswordToken;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.Authorizations;
-import org.apache.accumulo.minicluster.MiniAccumuloCluster;
-import org.apache.accumulo.minicluster.MiniAccumuloConfig;
-import org.apache.accumulo.minicluster.impl.MiniAccumuloConfigImpl;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -19,9 +15,8 @@ public class MACTest {
     @Test
     public void testStart() throws Exception {
 //        MiniAccumuloCluster cluster = new MiniAccumuloCluster(new File("/tmp/foo"), "supersecret");
-        MACConfig config = new MACConfig.MACConfigBuilder().
-                withFileLogging().build();
-        AccumuloCluster cluster = new MAC(config);
+        MACConfig config = new MACConfig.MACConfigBuilder().build();
+        MAC cluster = new MAC(config);
         try {
             cluster.start();
             System.out.println("Creating connector");

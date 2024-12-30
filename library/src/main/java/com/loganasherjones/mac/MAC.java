@@ -1,7 +1,5 @@
 package com.loganasherjones.mac;
 
-import org.apache.accumulo.cluster.AccumuloCluster;
-import org.apache.accumulo.cluster.ClusterControl;
 import org.apache.accumulo.core.client.AccumuloException;
 import org.apache.accumulo.core.client.AccumuloSecurityException;
 import org.apache.accumulo.core.client.ClientConfiguration;
@@ -9,7 +7,6 @@ import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.Instance;
 import org.apache.accumulo.core.client.ZooKeeperInstance;
 import org.apache.accumulo.core.client.security.tokens.AuthenticationToken;
-import org.apache.accumulo.core.conf.AccumuloConfiguration;
 import org.apache.accumulo.core.master.thrift.MasterGoalState;
 import org.apache.accumulo.gc.SimpleGarbageCollector;
 import org.apache.accumulo.master.Master;
@@ -20,7 +17,6 @@ import org.apache.accumulo.tserver.TabletServer;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.zookeeper.server.ZooKeeperServerMain;
-import org.mortbay.util.IO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MAC implements AccumuloCluster {
+public class MAC {
 
     private static final Logger log = LoggerFactory.getLogger(MAC.class);
 
@@ -52,23 +48,19 @@ public class MAC implements AccumuloCluster {
         this.config = config;
     }
 
-    @Override
     public String getInstanceName() {
         return this.config.getInstanceName();
     }
 
-    @Override
     public String getZooKeepers() {
         return config.getZooKeeperHost() + ":" + config.getZooKeeperPort();
     }
 
-    @Override
     public Connector getConnector(String user, AuthenticationToken token) throws AccumuloException, AccumuloSecurityException {
         Instance instance = new ZooKeeperInstance(getClientConfig());
         return instance.getConnector(user, token);
     }
 
-    @Override
     public ClientConfiguration getClientConfig() {
         return ClientConfiguration
                 .fromMap(config.getSiteConfig())
@@ -76,17 +68,6 @@ public class MAC implements AccumuloCluster {
                 .withZkHosts(this.getZooKeepers());
     }
 
-    @Override
-    public AccumuloConfiguration getSiteConfiguration() {
-        return null;
-    }
-
-    @Override
-    public ClusterControl getClusterControl() {
-        throw new RuntimeException("ClusterControl is not necessary for MAC.");
-    }
-
-    @Override
     public void start() throws Exception {
         if (initialized) {
             log.warn("start called on an already started MAC.");
@@ -108,7 +89,6 @@ public class MAC implements AccumuloCluster {
         initialized = true;
     }
 
-    @Override
     public void stop() throws IOException, InterruptedException {
         // TODO: Add thread-safeness here.
         log.debug("Flushing log writers...");
@@ -118,7 +98,7 @@ public class MAC implements AccumuloCluster {
 
         log.info("Stopping Mini Accumulo Cluster");
         log.debug("Stopping {} MAC processes...", processes.size());
-        for (Map.Entry<String, Process> entry: processes.entrySet()) {
+        for (Map.Entry<String, Process> entry : processes.entrySet()) {
             log.debug("Stopping '{}' process", entry.getKey());
             Process p = entry.getValue();
             p.destroy();
@@ -129,14 +109,12 @@ public class MAC implements AccumuloCluster {
         log.info("Mini Accumulo Cluster stopped.");
     }
 
-    @Override
-    public FileSystem getFileSystem() throws IOException {
-        return null;
-    }
-
-    @Override
-    public Path getTemporaryPath() {
-        return null;
+    public void runShell() throws IOException, InterruptedException {
+        String[] shellArgs = new String[]{"-u", "root", "-p", config.getRootPassword(), "-zi", config.getInstanceName(), "-zh", config.getZooKeeperHost() + ":" + config.getZooKeeperPort()};
+        Shell shell = new Shell();
+        shell.config(shellArgs);
+        shell.start();
+        shell.shutdown();
     }
 
     private void ensureZookeeperIsRunning() throws IOException, InterruptedException {
@@ -202,7 +180,7 @@ public class MAC implements AccumuloCluster {
         String classpath = config.getClasspathLoader().getClasspath();
         String className = SetGoalState.class.getName();
 
-        String processName =  "mac-" + config.getMACId() + "-accumulo-manager-state";
+        String processName = "mac-" + config.getMACId() + "-accumulo-manager-state";
         List<String> argList = new ArrayList<>(Arrays.asList(javaBin, "-Dproc=" + processName, "-cp", classpath));
 
         // TODO: Allow the user to specify JVM Opts from the config.
@@ -278,7 +256,7 @@ public class MAC implements AccumuloCluster {
         String classpath = config.getClasspathLoader().getClasspath();
         String className = Initialize.class.getName();
 
-        String processName =  "mac-" + config.getMACId() + "-accumulo-init";
+        String processName = "mac-" + config.getMACId() + "-accumulo-init";
         List<String> argList = new ArrayList<>(Arrays.asList(javaBin, "-Dproc=" + processName, "-cp", classpath));
 
         // TODO: Allow the user to specify JVM Opts from the config.
