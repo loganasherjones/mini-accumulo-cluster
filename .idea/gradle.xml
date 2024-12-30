@@ -5,11 +5,13 @@
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleJvm" value="temurin-1.8" />
+        <option name="gradleJvm" value="temurin-11" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/library" />
+            <option value="$PROJECT_DIR$/mac-app" />
+            <option value="$PROJECT_DIR$/test-client" />
           </set>
         </option>
       </GradleProjectSettings>

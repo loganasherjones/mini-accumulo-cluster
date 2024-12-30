@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    id("com.bmuschko.docker-remote-api") version "9.4.0" apply false
 }
 
 group = "com.loganasherjones"

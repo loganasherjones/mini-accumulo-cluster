@@ -16,7 +16,8 @@ the future.
 
 ## Library TODOs
 
-- [ ] Make the basics work
+- [x] Make the basics work
+- [ ] Make logging good
 - [ ] Figure out publishing
 - [ ] Play with GitHub Actions/Workflows
 - [ ] Figure out the license
@@ -27,8 +28,11 @@ the future.
 
 ## Application TODOs
 
-- [ ] Create a configurable application that runs the library
-- [ ] Create a docker image
+- [x] Create a configurable application that runs the library
+- [x] Create a docker image
+- [ ] Auto figure-out version number in docker build
+- [ ] Confirm testing works with docker image.
+- [ ] Confirm testing works with native app.
 - [ ] Publish the docker image
 - [ ] Add documentation
 - [ ] Add support for:
