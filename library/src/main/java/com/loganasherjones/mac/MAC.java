@@ -13,6 +13,7 @@ import org.apache.accumulo.master.Master;
 import org.apache.accumulo.master.state.SetGoalState;
 import org.apache.accumulo.minicluster.impl.ZooKeeperBindException;
 import org.apache.accumulo.server.init.Initialize;
+import org.apache.accumulo.shell.Shell;
 import org.apache.accumulo.tserver.TabletServer;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
