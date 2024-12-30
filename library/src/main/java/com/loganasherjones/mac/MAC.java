@@ -87,6 +87,7 @@ public class MAC {
         startGarbageCollector();
 
         initialized = true;
+        log.info("Mini Accumulo Cluster Started successfully");
     }
 
     public void stop() throws IOException, InterruptedException {
@@ -143,6 +144,7 @@ public class MAC {
 
         ProcessBuilder builder = new ProcessBuilder(argList);
 
+        log.info("Starting Accumulo GC");
         Process process = builder.start();
         processes.put(processName, process);
         captureOutput(processName, process);
@@ -169,6 +171,7 @@ public class MAC {
 
         ProcessBuilder builder = new ProcessBuilder(argList);
 
+        log.info("Starting Accumulo Manager");
         Process process = builder.start();
         processes.put(processName, process);
         captureOutput(processName, process);
@@ -189,7 +192,7 @@ public class MAC {
 
         ProcessBuilder builder = new ProcessBuilder(argList);
         log.info("Setting accumulo manager goal state.");
-        log.info(String.join(" ", argList));
+        log.debug(String.join(" ", argList));
         Process process = builder.start();
         captureOutput(processName, process);
         int retCode = process.waitFor();
@@ -199,7 +202,9 @@ public class MAC {
         }
 
     }
+
     private void startTabletServers() throws IOException {
+        log.info("Starting tablet servers...");
         // TODO: Add support for multiple tablet servers.
         String javaHome = System.getProperty("java.home");
         String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
@@ -225,6 +230,7 @@ public class MAC {
     }
 
     private void startZookeeperProcess() throws IOException {
+        log.info("Starting Zookeeper");
         String javaHome = System.getProperty("java.home");
         String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
         String classpath = config.getClasspathLoader().getClasspath();
@@ -242,6 +248,7 @@ public class MAC {
         argList.add(className);
         argList.add(config.getZooCfgFile().getAbsolutePath());
 
+        log.debug("Zookeeper Command: {}", String.join(" ", argList));
         ProcessBuilder builder = new ProcessBuilder(argList);
 
         Process process = builder.start();
@@ -271,7 +278,7 @@ public class MAC {
 
         ProcessBuilder builder = new ProcessBuilder(argList);
         log.info("Running accumulo init.");
-        log.info(String.join(" ", argList));
+        log.debug(String.join(" ", argList));
         Process process = builder.start();
         captureOutput(processName, process);
         int retCode = process.waitFor();
@@ -308,7 +315,7 @@ public class MAC {
                 byte[] buffer = new byte[100];
                 int n = s.getInputStream().read(buffer);
                 if (n >= 4 && new String(buffer, 0, 4).equals("imok")) {
-                    log.info("Zookeeper is up.");
+                    log.info("Zookeeper reported ok.");
                     return;
                 }
             } catch (Exception e) {
