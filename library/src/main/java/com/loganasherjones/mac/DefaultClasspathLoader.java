@@ -60,15 +60,15 @@ public class DefaultClasspathLoader implements ClasspathLoader {
                 } else {
                     if (classLoader.getClass().getName()
                             .equals("jdk.internal.loader.ClassLoaders$AppClassLoader")) {
-                        log.debug("Detected Java 11 classloader: {}", classLoader.getClass().getName());
+                        log.trace("Detected Java 11 classloader: {}", classLoader.getClass().getName());
                     } else {
-                        log.debug("Detected unknown classloader: {}", classLoader.getClass().getName());
+                        log.trace("Detected unknown classloader: {}", classLoader.getClass().getName());
                     }
                     String javaClassPath = System.getProperty("java.class.path");
                     if (javaClassPath == null) {
                         throw new IllegalStateException("java.class.path is not set");
                     } else {
-                        log.debug("Using classpath set by java.class.path system property: {}",
+                        log.trace("Using classpath set by java.class.path system property: {}",
                                 javaClassPath);
                     }
                     classpathBuilder.append(File.pathSeparator).append(javaClassPath);

@@ -146,6 +146,7 @@ public class MAC {
         ProcessBuilder builder = new ProcessBuilder(argList);
 
         log.info("Starting Accumulo GC");
+        log.debug(String.join(" ", argList));
         Process process = builder.start();
         processes.put(processName, process);
         captureOutput(processName, process);
@@ -173,6 +174,7 @@ public class MAC {
         ProcessBuilder builder = new ProcessBuilder(argList);
 
         log.info("Starting Accumulo Manager");
+        log.debug(String.join(" ", argList));
         Process process = builder.start();
         processes.put(processName, process);
         captureOutput(processName, process);
@@ -223,6 +225,7 @@ public class MAC {
         argList.add(className);
 //        argList.add(config.getZooCfgFile().getAbsolutePath());
 
+        log.debug("Tablet server command: {}", String.join(" ", argList));
         ProcessBuilder builder = new ProcessBuilder(argList);
 
         Process process = builder.start();
