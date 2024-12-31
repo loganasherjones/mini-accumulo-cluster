@@ -1,6 +1,8 @@
 package com.loganasherjones.mac;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
@@ -40,11 +42,21 @@ public class Main {
         System.setProperty("mac_log_level", macLogLevel);
     }
 
-    private static MACConfig generateConfig() {
+    private static MACConfig generateConfig() throws UnknownHostException {
         MACConfig.MACConfigBuilder builder = new MACConfig.MACConfigBuilder();
-        builder.withStaticZooKeeperPort(21811);
-        builder.withFileLogging();
-        return builder.build();
+        if (isInContainer()) {
+            builder.withAccumuloBindAddress(InetAddress.getLocalHost().getHostAddress());
+        }
+
+        return builder
+                .withStaticZooKeeperPort(21811) // TODO: Make this configurable
+                .withFileLogging() // TODO: Make this configurable
+                .build();
+    }
+
+    private static boolean isInContainer() {
+        String inContainer = System.getenv("MAC_IN_DOCKER_CONTAINER");
+        return inContainer != null && inContainer.equals("true");
     }
 
 }

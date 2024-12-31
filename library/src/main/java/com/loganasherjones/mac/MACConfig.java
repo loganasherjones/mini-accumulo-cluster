@@ -21,6 +21,7 @@ public class MACConfig {
     private final String zooKeeperHost;
     private int zooKeeperPort;
     private final Map<String, String> siteConfig;
+    private final String accumuloBindAddress;
 
     private MACConfig(
             String instanceName,
@@ -32,7 +33,8 @@ public class MACConfig {
             File baseDirectory,
             String zooKeeperHost,
             int zooKeeperPort,
-            Map<String, String> siteConfig
+            Map<String, String> siteConfig,
+            String accumuloBindAddress
     ) {
         this.instanceName = instanceName;
         this.rootPassword = rootPassword;
@@ -46,6 +48,7 @@ public class MACConfig {
         this.zooKeeperHost = zooKeeperHost;
         this.zooKeeperPort = zooKeeperPort;
         this.siteConfig = siteConfig;
+        this.accumuloBindAddress = accumuloBindAddress;
     }
 
     public String getInstanceName() {
@@ -82,6 +85,10 @@ public class MACConfig {
 
     public String getZooKeeperHost() {
         return this.zooKeeperHost;
+    }
+
+    public String getAccumuloBindAddress() {
+        return this.accumuloBindAddress;
     }
 
     public Map<String, String> getSiteConfig() {
@@ -162,6 +169,7 @@ public class MACConfig {
         private String zooKeeperHost = "127.0.0.1";
         private int zooKeeperPort = -1;
         private int zooKeeperStartupTimeout = 10000;
+        private String accumuloBindAddress = null;
 
         public MACConfigBuilder withInstanceName(String s) {
             this.instanceName = s;
@@ -205,6 +213,11 @@ public class MACConfig {
 
         public MACConfigBuilder withStaticZooKeeperPort(int port) {
             this.zooKeeperPort = port;
+            return this;
+        }
+
+        public MACConfigBuilder withAccumuloBindAddress(String address) {
+            this.accumuloBindAddress = address;
             return this;
         }
 
@@ -262,7 +275,8 @@ public class MACConfig {
                     baseDir,
                     this.zooKeeperHost,
                     this.zooKeeperPort,
-                    siteConfig
+                    siteConfig,
+                    accumuloBindAddress
             );
         }
     }

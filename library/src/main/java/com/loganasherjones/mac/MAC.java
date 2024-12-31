@@ -141,6 +141,7 @@ public class MAC {
 //        argList.addAll(jvmOpts);
 
         argList.add(className);
+        addAddressArg(argList);
 //        argList.add(config.getZooCfgFile().getAbsolutePath());
 
         ProcessBuilder builder = new ProcessBuilder(argList);
@@ -169,6 +170,7 @@ public class MAC {
 //        argList.addAll(jvmOpts);
 
         argList.add(className);
+        addAddressArg(argList);
 //        argList.add(config.getZooCfgFile().getAbsolutePath());
 
         ProcessBuilder builder = new ProcessBuilder(argList);
@@ -223,6 +225,7 @@ public class MAC {
 //        argList.addAll(jvmOpts);
 
         argList.add(className);
+        addAddressArg(argList);
 //        argList.add(config.getZooCfgFile().getAbsolutePath());
 
         log.debug("Tablet server command: {}", String.join(" ", argList));
@@ -355,6 +358,15 @@ public class MAC {
         outLogWriter.start();
         logWriters.add(errLogWriter);
         logWriters.add(outLogWriter);
+    }
+
+    private void addAddressArg(List<String> args) {
+        String address = config.getAccumuloBindAddress();
+        if (address == null || address.isEmpty()) {
+            return;
+        }
+        args.add("-a");
+        args.add(address);
     }
 
 }
