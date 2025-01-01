@@ -15,8 +15,6 @@ import org.apache.accumulo.minicluster.impl.ZooKeeperBindException;
 import org.apache.accumulo.server.init.Initialize;
 import org.apache.accumulo.shell.Shell;
 import org.apache.accumulo.tserver.TabletServer;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.apache.zookeeper.server.ZooKeeperServerMain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,7 +109,7 @@ public class MAC {
         log.info("Mini Accumulo Cluster stopped.");
     }
 
-    public void runShell() throws IOException, InterruptedException {
+    public void runShell() throws IOException {
         String[] shellArgs = new String[]{"-u", "root", "-p", config.getRootPassword(), "-zi", config.getInstanceName(), "-zh", config.getZooKeeperHost() + ":" + config.getZooKeeperPort()};
         Shell shell = new Shell();
         shell.config(shellArgs);
@@ -125,7 +123,7 @@ public class MAC {
         waitForZookeeperToBeOk();
     }
 
-    private void startGarbageCollector() throws IOException, InterruptedException {
+    private void startGarbageCollector() throws IOException {
         // TODO: Add support for multiple tablet servers.
         String javaHome = System.getProperty("java.home");
         String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
@@ -154,7 +152,7 @@ public class MAC {
     }
 
 
-    private void startManager() throws IOException, InterruptedException {
+    private void startManager() throws IOException {
         // TODO: Add support for multiple tablet servers.
         String javaHome = System.getProperty("java.home");
         String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
