@@ -22,9 +22,23 @@ the future.
 - [ ] Play with GitHub Actions/Workflows
 - [ ] Figure out the license
 - [ ] Add documentation
-- [ ] Add Support For:
+- [ ] Support For:
     - [ ] Existing Zookeeper
-    - [ ] Mini HDFS
+    - [ ] Mini HDFS(?)
+    - [ ] JVM Settings
+      - [ ] Zookeeper
+      - [ ] Manager
+      - [ ] Tablet Servers
+      - [ ] Garbage Collector
+    - [ ] Configuration File support
+      - [ ] Zoo.cfg Configuration Overrides
+      - [ ] accumulo-site.xml overrides
+- [ ] Automated tests for
+  - [ ] Custom Iterators
+  - [ ] Native MAC
+  - [ ] Docker MAC
+  - [ ] Docker Compose MAC
+  - [ ] Docker Compose Existing Zookeeper MAC
 
 ## Application TODOs
 
@@ -36,6 +50,8 @@ the future.
 - [ ] Publish the docker image
 - [ ] Add documentation
 - [ ] Add support for:
+  - [ ] Log Level Support
+  - [ ] Root / ZK / Accumulo / MAC
   - [ ] Auto Schema Creation
 
 ## Java Usage
