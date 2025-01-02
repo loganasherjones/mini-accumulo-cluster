@@ -228,6 +228,8 @@ public class MAC {
 
         log.debug("Tablet server command: {}", String.join(" ", argList));
         ProcessBuilder builder = new ProcessBuilder(argList);
+        // This is required to make lib ext loading work correctly.
+        builder.environment().put("ACCUMULO_HOME", config.getBaseDirectory().getAbsolutePath());
 
         Process process = builder.start();
         processes.put(processName, process);

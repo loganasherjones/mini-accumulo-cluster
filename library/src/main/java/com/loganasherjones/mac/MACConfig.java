@@ -95,6 +95,8 @@ public class MACConfig {
         return this.siteConfig;
     }
 
+    public File getBaseDirectory() { return this.baseDirectory; }
+
     public int getZooKeeperPort() {
         if (this.zooKeeperPort != -1) {
             return this.zooKeeperPort;
@@ -119,36 +121,35 @@ public class MACConfig {
             throw new IllegalArgumentException("Base Directory " + this.baseDirectory + " was not a directory.");
         }
 
-        if (Objects.requireNonNull(this.baseDirectory.list()).length != 0) {
-            throw new IllegalArgumentException("Base Directory " + this.baseDirectory + " was not empty.");
-        }
-
         configDirectory.mkdirs();
         logDirectory.mkdirs();
 
         File zooCfgFile = new File(configDirectory, "zoo.cfg");
-        FileWriter fw = new FileWriter(zooCfgFile);
-        Properties zooCfg = new Properties();
-        zooCfg.setProperty("clientPort", Integer.toString(getZooKeeperPort()));
-        zooCfg.setProperty("dataDir", configDirectory.getAbsolutePath());
-        zooCfg.setProperty("tickTime", "2000");
-        zooCfg.setProperty("maxClientCnxns", "1000");
-        zooCfg.setProperty("4lw.commands.whitelist", "*");
-        zooCfg.store(fw, null);
+        if (!zooCfgFile.exists()) {
+            FileWriter fw = new FileWriter(zooCfgFile);
+            Properties zooCfg = new Properties();
+            zooCfg.setProperty("clientPort", Integer.toString(getZooKeeperPort()));
+            zooCfg.setProperty("dataDir", configDirectory.getAbsolutePath());
+            zooCfg.setProperty("tickTime", "2000");
+            zooCfg.setProperty("maxClientCnxns", "1000");
+            zooCfg.setProperty("4lw.commands.whitelist", "*");
+            zooCfg.store(fw, null);
+        }
 
         File siteXml = new File(configDirectory, "accumulo-site.xml");
-        FileWriter fileWriter = new FileWriter(siteXml);
-        fileWriter.append("<configuration>").append(System.lineSeparator());
-        for (Map.Entry<String, String> item : siteConfig.entrySet()) {
-            String escapedValue = escapeXmlString(item.getValue());
-            fileWriter.append("  <property>").append(System.lineSeparator());
-            fileWriter.append("    <name>").append(item.getKey()).append("</name>").append(System.lineSeparator());
-            fileWriter.append("    <value>").append(escapedValue).append("</value>").append(System.lineSeparator());
-            fileWriter.append("  </property>").append(System.lineSeparator());
+        if (!siteXml.exists()) {
+            FileWriter fileWriter = new FileWriter(siteXml);
+            fileWriter.append("<configuration>").append(System.lineSeparator());
+            for (Map.Entry<String, String> item : siteConfig.entrySet()) {
+                String escapedValue = escapeXmlString(item.getValue());
+                fileWriter.append("  <property>").append(System.lineSeparator());
+                fileWriter.append("    <name>").append(item.getKey()).append("</name>").append(System.lineSeparator());
+                fileWriter.append("    <value>").append(escapedValue).append("</value>").append(System.lineSeparator());
+                fileWriter.append("  </property>").append(System.lineSeparator());
+            }
+            fileWriter.append("</configuration>").append(System.lineSeparator());
+            fileWriter.close();
         }
-        fileWriter.append("</configuration>").append(System.lineSeparator());
-        fileWriter.close();
-
     }
 
     private String escapeXmlString(String s) {
@@ -227,43 +228,23 @@ public class MACConfig {
             }
 
             File confDir = new File(this.baseDir, "conf");
+            File libDir = new File(this.baseDir, "lib");
+            File libExtDir = new File(libDir, "ext");
 
             if (this.classpathLoader == null) {
                 this.classpathLoader = new DefaultClasspathLoader(Collections.singletonList(confDir.getAbsolutePath()));
             }
 
             File accumuloData = new File(this.baseDir, "accumulo-data");
-            // TODO: Add better support for ext dir.
-            File extDir = new File(this.baseDir, "ext");
 
             Map<String, String> siteConfig = new HashMap<>();
-            // TODO: Unclear if this is required.
-//          siteConfig.put("trace.token.property.password", rootPassword);
             siteConfig.put("instance.dfs.dir", accumuloData.getAbsolutePath());
-
-            // TODO: Add better
-            siteConfig.put("general.dynamic.classpaths", extDir.getAbsolutePath());
-//          siteConfig.put("tserver.memory.maps.max</name><value>50M</value></property>
-//          siteConfig.put("gc.cycle.start</name><value>0s</value></property>
-//          siteConfig.put("master.port.client</name><value>0</value></property>
-//          siteConfig.put("tserver.cache.data.size</name><value>10M</value></property>
-//          siteConfig.put("monitor.port.client</name><value>0</value></property>
-//          siteConfig.put("tserver.port.client</name><value>0</value></property>
-//          siteConfig.put("tserver.cache.index.size</name><value>10M</value></property>
-//          siteConfig.put("gc.cycle.delay</name><value>4s</value></property>
-//          siteConfig.put("monitor.port.log4j</name><value>0</value></property>
-//          siteConfig.put("tserver.port.search</name><value>true</value></property>
-//          siteConfig.put("replication.receipt.service.port</name><value>0</value></property>
+            siteConfig.put("general.classpaths", libDir.getAbsolutePath() + "/[^.].*[.]jar");
+            siteConfig.put("general.dynamic.classpaths", libExtDir.getAbsolutePath() + "/[^.].*[.]jar");
             siteConfig.put("instance.dfs.uri", "file:///");
-//          siteConfig.put("tserver.memory.maps.native.enabled</name><value>false</value></property>
-//          siteConfig.put("trace.port.client</name><value>0</value></property>
-//          siteConfig.put("tserver.compaction.major.delay</name><value>3</value></property>
-//          siteConfig.put("tserver.walog.max.size</name><value>100M</value></property>
-            siteConfig.put("instance.secret", "DONTTELL");
-//          siteConfig.put("gc.port.client</name><value>0</value></property>
+            siteConfig.put("tserver.memory.maps.native.enabled", "false");
+            siteConfig.put("instance.secret", "alsonotsecure");
             siteConfig.put("instance.zookeeper.host", zooKeeperHost + ":" + zooKeeperPort);
-//          siteConfig.put("master.replication.coordinator.port</name><value>0</value></property>
-//          siteConfig.put("general.classpaths</name><value>/tmp/foo/lib/[^.].*[.]jar</value></property>
 
             return new MACConfig(
                     this.instanceName,
