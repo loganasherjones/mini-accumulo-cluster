@@ -34,8 +34,9 @@ the future.
       - [ ] Zoo.cfg Configuration Overrides
       - [ ] accumulo-site.xml overrides
 - [ ] Automated tests for
-  - [ ] Custom Iterators
-  - [ ] Native MAC
+  - [x] Custom Iterators (Native)
+  - [ ] Custom Iterators (Docker)
+  - [x] Native MAC
   - [ ] Docker MAC
   - [ ] Docker Compose MAC
   - [ ] Docker Compose Existing Zookeeper MAC
@@ -51,7 +52,7 @@ the future.
 - [ ] Add documentation
 - [ ] Add support for:
   - [ ] Log Level Support
-  - [ ] Root / ZK / Accumulo / MAC
+      - [ ] Root / ZK / Accumulo / MAC
   - [ ] Auto Schema Creation
 
 ## Java Usage
