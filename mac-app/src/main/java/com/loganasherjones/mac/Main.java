@@ -1,5 +1,6 @@
 package com.loganasherjones.mac;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -46,6 +47,11 @@ public class Main {
         MACConfig.MACConfigBuilder builder = new MACConfig.MACConfigBuilder();
         if (isInContainer()) {
             builder.withAccumuloBindAddress(InetAddress.getLocalHost().getHostAddress());
+        }
+
+        String baseDir = System.getenv("MAC_BASE_DIR");
+        if (baseDir != null && !baseDir.isEmpty()) {
+            builder.withBaseDirectory(new File(baseDir));
         }
 
         return builder
