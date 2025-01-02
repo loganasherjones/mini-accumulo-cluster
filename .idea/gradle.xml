@@ -12,6 +12,7 @@
             <option value="$PROJECT_DIR$/library" />
             <option value="$PROJECT_DIR$/mac-app" />
             <option value="$PROJECT_DIR$/test-client" />
+            <option value="$PROJECT_DIR$/test-iterator" />
           </set>
         </option>
       </GradleProjectSettings>

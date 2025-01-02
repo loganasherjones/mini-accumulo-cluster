@@ -140,6 +140,16 @@ public class TestClient {
         }
 
         assertEquals(4, count);
+
+        // Iterator Testing
+        scanner = conn.createScanner(table, new Authorizations("A", "B"));
+        IteratorSetting exampleIteratorSetting = new IteratorSetting(11, "example", "com.loganasherjones.mac.ExampleIterator");
+        scanner.addScanIterator(exampleIteratorSetting);
+        count = 0;
+        for (Map.Entry<Key, Value> ignored: scanner) {
+            count++;
+        }
+        assertEquals(0, count);
         scanner.close();
     }
 }
