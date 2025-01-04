@@ -29,8 +29,9 @@ tasks.test {
     useJUnitPlatform()
 }
 
-tasks.create("buildDockerImage", DockerBuildImage::class) {
+val buildImageTask by tasks.creating(DockerBuildImage::class) {
     dependsOn("distTar")
-    inputDir = file(".")
+    buildArgs = mapOf("PROJECT_VERSION" to  project.version.toString())
+    inputDir = file(project.projectDir)
     images.add("foo:latest")
 }

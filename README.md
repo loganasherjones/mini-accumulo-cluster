@@ -45,7 +45,7 @@ the future.
 
 - [x] Create a configurable application that runs the library
 - [x] Create a docker image
-- [ ] Auto figure-out version number in docker build
+- [x] Auto figure-out version number in docker build
 - [ ] Confirm testing works with docker image.
 - [ ] Confirm testing works with native app.
 - [ ] Publish the docker image
