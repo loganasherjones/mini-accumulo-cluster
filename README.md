@@ -35,11 +35,12 @@ the future.
       - [ ] accumulo-site.xml overrides
 - [ ] Automated tests for
   - [x] Custom Iterators (Native)
-  - [ ] Custom Iterators (Docker)
+  - [x] Custom Iterators (Docker)
   - [x] Native MAC
-  - [ ] Docker MAC
+  - [x] Docker MAC
   - [ ] Docker Compose MAC
   - [ ] Docker Compose Existing Zookeeper MAC
+  - [ ] Test Containers
 
 ## Application TODOs
 
