@@ -1,3 +1,6 @@
+import com.bmuschko.gradle.docker.tasks.container.DockerCreateContainer
+import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
+import com.bmuschko.gradle.docker.tasks.container.DockerStopContainer
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 
 plugins {
@@ -23,15 +26,41 @@ dependencies {
     implementation("ch.qos.reload4j:reload4j:1.2.22")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation(project(":test-client"))
 }
 
 tasks.test {
     useJUnitPlatform()
+    dependsOn(startDefaultContainer)
+    finalizedBy(stopDefaultContainer)
 }
 
 val buildImageTask by tasks.creating(DockerBuildImage::class) {
     dependsOn("distTar")
+    dependsOn("compileTestJava")
+    dependsOn("processTestResources")
     buildArgs = mapOf("PROJECT_VERSION" to  project.version.toString())
     inputDir = file(project.projectDir)
     images.add("foo:latest")
+}
+
+
+val createDefaultMacContainer by tasks.creating(DockerCreateContainer::class) {
+    dependsOn(buildImageTask)
+    dependsOn(":test-iterator:build")
+    targetImageId(buildImageTask.imageId)
+    exposePorts("tcp", listOf(21811))
+    hostConfig.portBindings.set(listOf("21811:21811"))
+    hostConfig.autoRemove.set(true)
+    hostConfig.binds.set(mapOf("${project.layout.buildDirectory.get()}/iterators" to "/app/lib/ext"))
+}
+
+val startDefaultContainer by tasks.creating(DockerStartContainer::class) {
+    dependsOn(createDefaultMacContainer)
+    targetContainerId(createDefaultMacContainer.containerId)
+}
+
+val stopDefaultContainer by tasks.creating(DockerStopContainer::class) {
+    targetContainerId(createDefaultMacContainer.containerId)
 }
