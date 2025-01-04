@@ -142,6 +142,7 @@ public class TestClient {
         assertEquals(4, count);
 
         // Iterator Testing
+        log.info("Testing custom iterator scanning.");
         scanner = conn.createScanner(table, new Authorizations("A", "B"));
         IteratorSetting exampleIteratorSetting = new IteratorSetting(11, "example", "com.loganasherjones.mac.ExampleIterator");
         scanner.addScanIterator(exampleIteratorSetting);
