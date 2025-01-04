@@ -15,7 +15,7 @@ dependencies {
 
 val copyJars by tasks.register("copyJars", Copy::class) {
     from(tasks.jar.get().outputs) // Copies the project's JAR
-    into("${rootProject.projectDir.absolutePath}/test-client/src/main/resources") // Destinatino directory
+    into("${project(":mac-app").layout.buildDirectory.get()}/iterators")
 }
 
 tasks.build {
