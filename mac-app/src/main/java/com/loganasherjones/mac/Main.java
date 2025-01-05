@@ -54,8 +54,14 @@ public class Main {
             builder.withBaseDirectory(new File(baseDir));
         }
 
+        String zookeeperPortStr = System.getenv("MAC_ZOOKEEPER_PORT");
+        int zookeeperPort = 21811;
+        if (zookeeperPortStr != null && !zookeeperPortStr.isEmpty()) {
+            zookeeperPort = Integer.parseInt(zookeeperPortStr);
+        }
+
         return builder
-                .withStaticZooKeeperPort(21811) // TODO: Make this configurable
+                .withStaticZooKeeperPort(zookeeperPort)
                 .withFileLogging() // TODO: Make this configurable
                 .build();
     }
