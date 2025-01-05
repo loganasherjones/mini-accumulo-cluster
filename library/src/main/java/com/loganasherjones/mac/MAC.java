@@ -228,30 +228,18 @@ public class MAC {
     }
 
     private void startZookeeperProcess() throws IOException {
-        log.info("Starting Zookeeper");
-        String javaHome = System.getProperty("java.home");
-        String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
-        String classpath = config.getClasspathLoader().getClasspath();
+        String processName = "mac-" + config.getMACId() + "-zookeeper";
         String className = ZooKeeperServerMain.class.getName();
 
-        String processName = "mac-" + config.getMACId() + "-zookeeper";
-        List<String> argList = new ArrayList<>(Arrays.asList(javaBin, "-Dproc=" + processName, "-cp", classpath));
+        // TODO: Allow user to specify jvm properties.
+        Map<String, String> jvmProperties = new HashMap<>();
+        jvmProperties.put("zookeeper.jmx.log4j.disable", "true");
 
-        List<String> jvmOpts = new ArrayList<>();
-        jvmOpts.add("-Dzookeeper.jmx.log4j.disable=true");
+        List<String> additionalArgs = new ArrayList<>();
+        additionalArgs.add(config.getZooCfgFile().getAbsolutePath());
 
-        // TODO: Allow the user to specify JVM Opts from the config.
-        argList.addAll(jvmOpts);
-
-        argList.add(className);
-        argList.add(config.getZooCfgFile().getAbsolutePath());
-
-        log.debug("Zookeeper Command: {}", String.join(" ", argList));
-        ProcessBuilder builder = new ProcessBuilder(argList);
-
-        Process process = builder.start();
-        processes.put(processName, process);
-        captureOutput(processName, process);
+        MACProcess process = spawner.spawnProcess(processName, className, additionalArgs, jvmProperties);
+        macProcesses.add(process);
     }
 
 

@@ -9,7 +9,9 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A helper class for spawning processes for the mini-accumulo-cluster.
@@ -32,11 +34,31 @@ public class MACProcessSpawner {
     public MACProcess spawnProcess(
             String processName,
             String className,
-            List<String> cliArgs
+            List<String> additionalArgs
+    ) throws IOException {
+        return spawnProcess(
+                processName,
+                className,
+                additionalArgs,
+                new HashMap<>()
+        );
+    }
+
+    public MACProcess spawnProcess(
+            String processName,
+            String className,
+            List<String> additionalArgs,
+            Map<String, String> jvmProperties
     ) throws IOException {
         String classpath = classpathLoader.getClasspath();
-        List<String> argList = new ArrayList<>(Arrays.asList(javaBin, "-Dproc=" + processName, "-cp", classpath, className));
-        argList.addAll(cliArgs);
+        List<String> argList = new ArrayList<>(Arrays.asList(javaBin, "-Dproc=" + processName, "-cp", classpath));
+
+        for (Map.Entry<String, String> entry : jvmProperties.entrySet()) {
+            argList.add("-D" + entry.getKey() + "=" + entry.getValue());
+        }
+
+        argList.add(className);
+        argList.addAll(additionalArgs);
 
         log.info("Starting {} Process", processName);
         log.debug(String.join(" ", argList));
