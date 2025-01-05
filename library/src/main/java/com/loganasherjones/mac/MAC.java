@@ -231,14 +231,10 @@ public class MAC {
         String processName = "mac-" + config.getMACId() + "-zookeeper";
         String className = ZooKeeperServerMain.class.getName();
 
-        // TODO: Allow user to specify jvm properties.
-        Map<String, String> jvmProperties = new HashMap<>();
-        jvmProperties.put("zookeeper.jmx.log4j.disable", "true");
-
         List<String> additionalArgs = new ArrayList<>();
         additionalArgs.add(config.getZooCfgFile().getAbsolutePath());
 
-        MACProcess process = spawner.spawnProcess(processName, className, additionalArgs, jvmProperties);
+        MACProcess process = spawner.spawnProcess(processName, className, additionalArgs, config.getZooKeeperJvmProperties());
         macProcesses.add(process);
     }
 

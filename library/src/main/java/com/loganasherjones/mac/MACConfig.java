@@ -22,6 +22,7 @@ public class MACConfig {
     private int zooKeeperPort;
     private final Map<String, String> siteConfig;
     private final String accumuloBindAddress;
+    private final Map<String, String> zooKeeperJvmProperties;
 
     private MACConfig(
             String instanceName,
@@ -34,7 +35,8 @@ public class MACConfig {
             String zooKeeperHost,
             int zooKeeperPort,
             Map<String, String> siteConfig,
-            String accumuloBindAddress
+            String accumuloBindAddress,
+            Map<String, String> zooKeeperJvmProperties
     ) {
         this.instanceName = instanceName;
         this.rootPassword = rootPassword;
@@ -49,6 +51,7 @@ public class MACConfig {
         this.zooKeeperPort = zooKeeperPort;
         this.siteConfig = siteConfig;
         this.accumuloBindAddress = accumuloBindAddress;
+        this.zooKeeperJvmProperties = zooKeeperJvmProperties;
     }
 
     public String getInstanceName() {
@@ -110,6 +113,10 @@ public class MACConfig {
         }
 
         return this.zooKeeperPort;
+    }
+
+    public Map<String, String> getZooKeeperJvmProperties() {
+        return zooKeeperJvmProperties;
     }
 
     public void createDirectoryStructure() throws IOException {
@@ -175,6 +182,9 @@ public class MACConfig {
         private int zooKeeperPort = -1;
         private int zooKeeperStartupTimeout = 10000;
         private String accumuloBindAddress = null;
+        private Map<String, String> zookeeperJvmProperties = new HashMap<>() {{
+            put("zookeeper.jmx.log4j.disable", "true");
+        }};
 
         public MACConfigBuilder withInstanceName(String s) {
             this.instanceName = s;
@@ -226,6 +236,11 @@ public class MACConfig {
             return this;
         }
 
+        public MACConfigBuilder withZookeeperJavaProperty(String key, String value) {
+            zookeeperJvmProperties.put(key, value);
+            return this;
+        }
+
         public MACConfig build() {
             if (this.baseDir == null) {
                 this.baseDir = new File(System.getProperty("java.io.tmpdir"), "mac-" + this.macId);
@@ -261,7 +276,8 @@ public class MACConfig {
                     this.zooKeeperHost,
                     this.zooKeeperPort,
                     siteConfig,
-                    accumuloBindAddress
+                    accumuloBindAddress,
+                    zookeeperJvmProperties
             );
         }
     }
