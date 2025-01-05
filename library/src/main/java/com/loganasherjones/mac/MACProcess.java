@@ -35,4 +35,8 @@ public class MACProcess {
         int retCode = process.waitFor();
         log.debug("Process {} stopped (return={})", processName, retCode);
     }
+
+    public int waitFor() throws InterruptedException {
+        return process.waitFor();
+    }
 }

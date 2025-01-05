@@ -40,6 +40,7 @@ public class MACProcessSpawner {
                 processName,
                 className,
                 additionalArgs,
+                new HashMap<>(),
                 new HashMap<>()
         );
     }
@@ -49,6 +50,22 @@ public class MACProcessSpawner {
             String className,
             List<String> additionalArgs,
             Map<String, String> jvmProperties
+    ) throws IOException {
+        return spawnProcess(
+                processName,
+                className,
+                additionalArgs,
+                jvmProperties,
+                new HashMap<>()
+        );
+    }
+
+    public MACProcess spawnProcess(
+            String processName,
+            String className,
+            List<String> additionalArgs,
+            Map<String, String> jvmProperties,
+            Map<String, String> environment
     ) throws IOException {
         String classpath = classpathLoader.getClasspath();
         List<String> argList = new ArrayList<>(Arrays.asList(javaBin, "-Dproc=" + processName, "-cp", classpath));
@@ -63,6 +80,11 @@ public class MACProcessSpawner {
         log.info("Starting {} Process", processName);
         log.debug(String.join(" ", argList));
         ProcessBuilder builder = new ProcessBuilder(argList);
+
+        for (Map.Entry<String, String> entry : environment.entrySet()) {
+            builder.environment().put(entry.getKey(), entry.getValue());
+        }
+
         Process process = builder.start();
         LogWriter stderrWriter = spawnStdErrWriter(processName, process);
         LogWriter stdoutWriter = spawnStdOutWriter(processName, process);

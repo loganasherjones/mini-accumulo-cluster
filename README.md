@@ -27,7 +27,7 @@ the future.
     - [ ] Mini HDFS(?)
     - [ ] JVM Settings
       - [x] Zookeeper
-      - [ ] Manager
+      - [x] Manager
       - [ ] Tablet Servers
       - [x] Garbage Collector
     - [ ] Configuration File support

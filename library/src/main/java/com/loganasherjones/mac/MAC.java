@@ -156,23 +156,12 @@ public class MAC {
     }
 
     private void setManagerGoalState() throws IOException, InterruptedException {
-        String javaHome = System.getProperty("java.home");
-        String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
-        String classpath = config.getClasspathLoader().getClasspath();
-        String className = SetGoalState.class.getName();
-
         String processName = "mac-" + config.getMACId() + "-accumulo-manager-state";
-        List<String> argList = new ArrayList<>(Arrays.asList(javaBin, "-Dproc=" + processName, "-cp", classpath));
-
-        // TODO: Allow the user to specify JVM Opts from the config.
-        argList.add(className);
-        argList.add(MasterGoalState.NORMAL.toString());
-
-        ProcessBuilder builder = new ProcessBuilder(argList);
-        log.info("Setting accumulo manager goal state.");
-        log.debug(String.join(" ", argList));
-        Process process = builder.start();
-        captureOutput(processName, process);
+        MACProcess process = spawner.spawnProcess(
+                processName,
+                SetGoalState.class.getName(),
+                Collections.singletonList(MasterGoalState.NORMAL.toString())
+        );
         int retCode = process.waitFor();
         if (retCode != 0) {
             log.error("Error setting manager goal state.");
@@ -182,33 +171,25 @@ public class MAC {
     }
 
     private void startTabletServers() throws IOException {
-        log.info("Starting tablet servers...");
         // TODO: Add support for multiple tablet servers.
-        String javaHome = System.getProperty("java.home");
-        String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
-        String classpath = config.getClasspathLoader().getClasspath();
-        String className = TabletServer.class.getName();
+        for (int i = 0; i < 1; i++) {
+            startTabletServer(i);
+        }
+    }
 
-        String processName = "mac-" + config.getMACId() + "-tserver";
-        List<String> argList = new ArrayList<>(Arrays.asList(javaBin, "-Dproc=" + processName, "-cp", classpath));
-
-//        List<String> jvmOpts = new ArrayList<>();
-
-        // TODO: Allow the user to specify JVM Opts from the config.
-//        argList.addAll(jvmOpts);
-
-        argList.add(className);
-        addAddressArg(argList);
-//        argList.add(config.getZooCfgFile().getAbsolutePath());
-
-        log.debug("Tablet server command: {}", String.join(" ", argList));
-        ProcessBuilder builder = new ProcessBuilder(argList);
-        // This is required to make lib ext loading work correctly.
-        builder.environment().put("ACCUMULO_HOME", config.getBaseDirectory().getAbsolutePath());
-
-        Process process = builder.start();
-        processes.put(processName, process);
-        captureOutput(processName, process);
+    private void startTabletServer(int num) throws IOException {
+        String processName = "mac-" + config.getMACId() + "-tserver-" + num;
+        Map<String, String> env = new HashMap<>() {{
+            put("ACCUMULO_HOME", config.getBaseDirectory().getAbsolutePath());
+        }};
+        MACProcess process = spawner.spawnProcess(
+                processName,
+                TabletServer.class.getName(),
+                getAccumuloAddressArgs(),
+                config.getAccumuloTserverJvmProperties(),
+                env
+        );
+        macProcesses.add(process);
     }
 
     private void startZookeeperProcess() throws IOException {

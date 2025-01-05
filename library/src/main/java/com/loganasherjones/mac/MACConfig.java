@@ -22,9 +22,7 @@ public class MACConfig {
     private int zooKeeperPort;
     private final Map<String, String> siteConfig;
     private final String accumuloBindAddress;
-    private final Map<String, String> zooKeeperJvmProperties;
-    private final Map<String, String> accumuloGCJvmProperties;
-    private final Map<String, String> accumuloManagerJvmProperties;
+    private final Map<String, Map<String, String>> jvmProperties = new HashMap<>();
 
     private MACConfig(
             String instanceName,
@@ -40,7 +38,8 @@ public class MACConfig {
             String accumuloBindAddress,
             Map<String, String> zooKeeperJvmProperties,
             Map<String, String> accumuloGCJvmProperties,
-            Map<String, String> accumuloManagerJvmProperties
+            Map<String, String> accumuloManagerJvmProperties,
+            Map<String, String> accumuloTserverJvmProperties
     ) {
         this.instanceName = instanceName;
         this.rootPassword = rootPassword;
@@ -55,9 +54,10 @@ public class MACConfig {
         this.zooKeeperPort = zooKeeperPort;
         this.siteConfig = siteConfig;
         this.accumuloBindAddress = accumuloBindAddress;
-        this.zooKeeperJvmProperties = zooKeeperJvmProperties;
-        this.accumuloGCJvmProperties = accumuloGCJvmProperties;
-        this.accumuloManagerJvmProperties = accumuloManagerJvmProperties;
+        this.jvmProperties.put("zookeeper", zooKeeperJvmProperties);
+        this.jvmProperties.put("gc", accumuloGCJvmProperties);
+        this.jvmProperties.put("manager", accumuloManagerJvmProperties);
+        this.jvmProperties.put("tserver", accumuloTserverJvmProperties);
     }
 
     public String getInstanceName() {
@@ -122,11 +122,11 @@ public class MACConfig {
     }
 
     public Map<String, String> getZooKeeperJvmProperties() {
-        return zooKeeperJvmProperties;
+        return jvmProperties.get("zookeeper");
     }
 
     public Map<String, String> getAccumuloGCJvmProperties() {
-        return accumuloGCJvmProperties;
+        return jvmProperties.get("gc");
     }
 
     public void createDirectoryStructure() throws IOException {
@@ -181,7 +181,11 @@ public class MACConfig {
     }
 
     public Map<String, String> getAccumuloManagerJvmProperties() {
-        return accumuloManagerJvmProperties;
+        return jvmProperties.get("manager");
+    }
+
+    public Map<String, String> getAccumuloTserverJvmProperties() {
+        return jvmProperties.get("tserver");
     }
 
     public static class MACConfigBuilder {
@@ -196,9 +200,10 @@ public class MACConfig {
         private int zooKeeperPort = -1;
         private int zooKeeperStartupTimeout = 10000;
         private String accumuloBindAddress = null;
-        private Map<String, String> accumuloGCJvmProperties = new HashMap<>();
-        private Map<String, String> accumuloManagerJvmProperties = new HashMap<>();
-        private Map<String, String> zookeeperJvmProperties = new HashMap<>() {{
+        private final Map<String, String> accumuloGCJvmProperties = new HashMap<>();
+        private final Map<String, String> accumuloManagerJvmProperties = new HashMap<>();
+        private final Map<String, String> accumuloTserverJvmProperties = new HashMap<>();
+        private final Map<String, String> zookeeperJvmProperties = new HashMap<>() {{
             put("zookeeper.jmx.log4j.disable", "true");
         }};
 
@@ -267,6 +272,11 @@ public class MACConfig {
             return this;
         }
 
+        public MACConfigBuilder withAccumuloTServerJavaProperty(String key, String value) {
+            accumuloTserverJvmProperties.put(key, value);
+            return this;
+        }
+
         public MACConfig build() {
             if (this.baseDir == null) {
                 this.baseDir = new File(System.getProperty("java.io.tmpdir"), "mac-" + this.macId);
@@ -305,7 +315,8 @@ public class MACConfig {
                     accumuloBindAddress,
                     zookeeperJvmProperties,
                     accumuloGCJvmProperties,
-                    accumuloManagerJvmProperties
+                    accumuloManagerJvmProperties,
+                    accumuloTserverJvmProperties
             );
         }
     }
