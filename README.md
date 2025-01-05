@@ -39,7 +39,7 @@ the future.
   - [x] Native MAC
   - [x] Docker MAC
   - [x] Docker Compose MAC
-  - [ ] Docker Compose Existing Zookeeper MAC
+  - [x] Docker Compose Existing Zookeeper MAC
   - [ ] Test Containers
 
 ## Application TODOs
