@@ -19,13 +19,9 @@ import org.apache.zookeeper.server.ZooKeeperServerMain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.Socket;
-import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -39,8 +35,6 @@ public class MAC {
     private final MACProcessSpawner spawner;
     private boolean initialized = false;
     private final List<MACProcess> macProcesses = new ArrayList<>();
-    private final Map<String, Process> processes = new HashMap<>();
-    private final List<LogWriter> logWriters = new ArrayList<>();
 
     public MAC() {
         this(new MACConfig.MACConfigBuilder().build());
@@ -95,22 +89,7 @@ public class MAC {
 
     public void stop() throws IOException, InterruptedException {
         // TODO: Add thread-safeness here.
-        log.debug("Flushing log writers...");
-        for (LogWriter lw : logWriters) {
-            lw.flush();
-        }
-
         log.info("Stopping Mini Accumulo Cluster");
-        log.debug("Stopping {} MAC processes...", processes.size());
-        for (Map.Entry<String, Process> entry : processes.entrySet()) {
-            log.debug("Stopping '{}' process", entry.getKey());
-            Process p = entry.getValue();
-            p.destroy();
-            log.debug("Waiting for '{}' process to stop.", entry.getKey());
-            p.waitFor();
-            log.debug("Process '{}' successfully stopped.", entry.getKey());
-        }
-
         for (MACProcess process : macProcesses) {
             process.stop();
         }
@@ -267,36 +246,6 @@ public class MAC {
                 Thread.sleep(250);
             }
         }
-    }
-
-    private void captureOutput(String processName, Process process) throws IOException {
-        OutputStream stderrStream;
-        OutputStream stdoutStream;
-        if (config.logToFiles()) {
-            File errLogFile = new File(config.getLogDir(), processName + ".err");
-            stderrStream = Files.newOutputStream(errLogFile.toPath());
-
-            File outLogFile = new File(config.getLogDir(), processName + ".out");
-            stdoutStream = Files.newOutputStream(outLogFile.toPath());
-        } else {
-            stderrStream = System.err;
-            stdoutStream = System.out;
-        }
-        LogWriter errLogWriter = new LogWriter(process.getErrorStream(), stderrStream);
-        LogWriter outLogWriter = new LogWriter(process.getInputStream(), stdoutStream);
-        errLogWriter.start();
-        outLogWriter.start();
-        logWriters.add(errLogWriter);
-        logWriters.add(outLogWriter);
-    }
-
-    private void addAddressArg(List<String> args) {
-        String address = config.getAccumuloBindAddress();
-        if (address == null || address.isEmpty()) {
-            return;
-        }
-        args.add("-a");
-        args.add(address);
     }
 
     private List<String> getAccumuloAddressArgs() {
