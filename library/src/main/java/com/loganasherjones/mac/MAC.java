@@ -204,29 +204,20 @@ public class MAC {
 
 
     private void initializeAccumulo() throws IOException, InterruptedException {
-        String javaHome = System.getProperty("java.home");
-        String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
-        String classpath = config.getClasspathLoader().getClasspath();
-        String className = Initialize.class.getName();
-
         String processName = "mac-" + config.getMACId() + "-accumulo-init";
-        List<String> argList = new ArrayList<>(Arrays.asList(javaBin, "-Dproc=" + processName, "-cp", classpath));
-
-        // TODO: Allow the user to specify JVM Opts from the config.
-        argList.add(className);
-        argList.add("--instance-name");
-        argList.add(config.getInstanceName());
-        argList.add("--user");
-        argList.add("root");
-        argList.add("--clear-instance-name");
-        argList.add("--password");
-        argList.add(config.getRootPassword());
-
-        ProcessBuilder builder = new ProcessBuilder(argList);
-        log.info("Running accumulo init.");
-        log.debug(String.join(" ", argList));
-        Process process = builder.start();
-        captureOutput(processName, process);
+        List<String> additionalArgs = new ArrayList<>();
+        additionalArgs.add("--instance-name");
+        additionalArgs.add(config.getInstanceName());
+        additionalArgs.add("--user");
+        additionalArgs.add("root");
+        additionalArgs.add("--clear-instance-name");
+        additionalArgs.add("--password");
+        additionalArgs.add(config.getRootPassword());
+        MACProcess process = spawner.spawnProcess(
+                processName,
+                Initialize.class.getName(),
+                additionalArgs
+        );
         int retCode = process.waitFor();
         if (retCode != 0) {
             log.error("Error initializing accumulo.");
