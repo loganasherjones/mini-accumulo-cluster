@@ -23,6 +23,7 @@ public class MACConfig {
     private final Map<String, String> siteConfig;
     private final String accumuloBindAddress;
     private final Map<String, Map<String, String>> jvmProperties = new HashMap<>();
+    private final int numTservers;
 
     private MACConfig(
             String instanceName,
@@ -39,7 +40,8 @@ public class MACConfig {
             Map<String, String> zooKeeperJvmProperties,
             Map<String, String> accumuloGCJvmProperties,
             Map<String, String> accumuloManagerJvmProperties,
-            Map<String, String> accumuloTserverJvmProperties
+            Map<String, String> accumuloTserverJvmProperties,
+            int numTservers
     ) {
         this.instanceName = instanceName;
         this.rootPassword = rootPassword;
@@ -58,6 +60,7 @@ public class MACConfig {
         this.jvmProperties.put("gc", accumuloGCJvmProperties);
         this.jvmProperties.put("manager", accumuloManagerJvmProperties);
         this.jvmProperties.put("tserver", accumuloTserverJvmProperties);
+        this.numTservers = numTservers;
     }
 
     public String getInstanceName() {
@@ -188,6 +191,10 @@ public class MACConfig {
         return jvmProperties.get("tserver");
     }
 
+    public int getNumTservers() {
+        return numTservers;
+    }
+
     public static class MACConfigBuilder {
 
         private String macId = UUID.randomUUID().toString();
@@ -206,6 +213,7 @@ public class MACConfig {
         private final Map<String, String> zookeeperJvmProperties = new HashMap<>() {{
             put("zookeeper.jmx.log4j.disable", "true");
         }};
+        private int numTservers = 2;
 
         public MACConfigBuilder withInstanceName(String s) {
             this.instanceName = s;
@@ -277,6 +285,11 @@ public class MACConfig {
             return this;
         }
 
+        public MACConfigBuilder withNumTservers(int num) {
+            this.numTservers = num;
+            return this;
+        }
+
         public MACConfig build() {
             if (this.baseDir == null) {
                 this.baseDir = new File(System.getProperty("java.io.tmpdir"), "mac-" + this.macId);
@@ -301,6 +314,10 @@ public class MACConfig {
             siteConfig.put("instance.secret", "alsonotsecure");
             siteConfig.put("instance.zookeeper.host", zooKeeperHost + ":" + zooKeeperPort);
 
+            if (numTservers <= 0) {
+                throw new IllegalArgumentException("numTservers must be greater than 0");
+            }
+
             return new MACConfig(
                     this.instanceName,
                     this.rootPassword,
@@ -316,7 +333,8 @@ public class MACConfig {
                     zookeeperJvmProperties,
                     accumuloGCJvmProperties,
                     accumuloManagerJvmProperties,
-                    accumuloTserverJvmProperties
+                    accumuloTserverJvmProperties,
+                    numTservers
             );
         }
     }

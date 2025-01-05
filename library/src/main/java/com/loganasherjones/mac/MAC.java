@@ -171,8 +171,7 @@ public class MAC {
     }
 
     private void startTabletServers() throws IOException {
-        // TODO: Add support for multiple tablet servers.
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < config.getNumTservers(); i++) {
             startTabletServer(i);
         }
     }

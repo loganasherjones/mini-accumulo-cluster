@@ -25,10 +25,10 @@ the future.
 - [ ] Support For:
     - [x] Existing Zookeeper
     - [ ] Mini HDFS(?)
-    - [ ] JVM Settings
+    - [x] JVM Settings
       - [x] Zookeeper
       - [x] Manager
-      - [ ] Tablet Servers
+      - [x] Tablet Servers
       - [x] Garbage Collector
     - [ ] Configuration File support
       - [ ] Zoo.cfg Configuration Overrides
