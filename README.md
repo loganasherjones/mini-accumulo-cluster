@@ -38,7 +38,7 @@ the future.
   - [x] Custom Iterators (Docker)
   - [x] Native MAC
   - [x] Docker MAC
-  - [ ] Docker Compose MAC
+  - [x] Docker Compose MAC
   - [ ] Docker Compose Existing Zookeeper MAC
   - [ ] Test Containers
 
