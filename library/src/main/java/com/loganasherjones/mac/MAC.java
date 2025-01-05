@@ -145,31 +145,14 @@ public class MAC {
 
 
     private void startManager() throws IOException {
-        // TODO: Add support for multiple tablet servers.
-        String javaHome = System.getProperty("java.home");
-        String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
-        String classpath = config.getClasspathLoader().getClasspath();
-        String className = Master.class.getName();
-
         String processName = "mac-" + config.getMACId() + "-manager";
-        List<String> argList = new ArrayList<>(Arrays.asList(javaBin, "-Dproc=" + processName, "-cp", classpath));
-
-//        List<String> jvmOpts = new ArrayList<>();
-
-        // TODO: Allow the user to specify JVM Opts from the config.
-//        argList.addAll(jvmOpts);
-
-        argList.add(className);
-        addAddressArg(argList);
-//        argList.add(config.getZooCfgFile().getAbsolutePath());
-
-        ProcessBuilder builder = new ProcessBuilder(argList);
-
-        log.info("Starting Accumulo Manager");
-        log.debug(String.join(" ", argList));
-        Process process = builder.start();
-        processes.put(processName, process);
-        captureOutput(processName, process);
+        MACProcess process = spawner.spawnProcess(
+                processName,
+                Master.class.getName(),
+                getAccumuloAddressArgs(),
+                config.getAccumuloManagerJvmProperties()
+        );
+        macProcesses.add(process);
     }
 
     private void setManagerGoalState() throws IOException, InterruptedException {

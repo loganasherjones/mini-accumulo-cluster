@@ -24,6 +24,7 @@ public class MACConfig {
     private final String accumuloBindAddress;
     private final Map<String, String> zooKeeperJvmProperties;
     private final Map<String, String> accumuloGCJvmProperties;
+    private final Map<String, String> accumuloManagerJvmProperties;
 
     private MACConfig(
             String instanceName,
@@ -38,7 +39,8 @@ public class MACConfig {
             Map<String, String> siteConfig,
             String accumuloBindAddress,
             Map<String, String> zooKeeperJvmProperties,
-            Map<String, String> accumuloGCJvmProperties
+            Map<String, String> accumuloGCJvmProperties,
+            Map<String, String> accumuloManagerJvmProperties
     ) {
         this.instanceName = instanceName;
         this.rootPassword = rootPassword;
@@ -55,6 +57,7 @@ public class MACConfig {
         this.accumuloBindAddress = accumuloBindAddress;
         this.zooKeeperJvmProperties = zooKeeperJvmProperties;
         this.accumuloGCJvmProperties = accumuloGCJvmProperties;
+        this.accumuloManagerJvmProperties = accumuloManagerJvmProperties;
     }
 
     public String getInstanceName() {
@@ -177,6 +180,10 @@ public class MACConfig {
         return !(zooKeeperHost.equals("localhost") || zooKeeperHost.equals("127.0.0.1"));
     }
 
+    public Map<String, String> getAccumuloManagerJvmProperties() {
+        return accumuloManagerJvmProperties;
+    }
+
     public static class MACConfigBuilder {
 
         private String macId = UUID.randomUUID().toString();
@@ -190,6 +197,7 @@ public class MACConfig {
         private int zooKeeperStartupTimeout = 10000;
         private String accumuloBindAddress = null;
         private Map<String, String> accumuloGCJvmProperties = new HashMap<>();
+        private Map<String, String> accumuloManagerJvmProperties = new HashMap<>();
         private Map<String, String> zookeeperJvmProperties = new HashMap<>() {{
             put("zookeeper.jmx.log4j.disable", "true");
         }};
@@ -254,6 +262,11 @@ public class MACConfig {
             return this;
         }
 
+        public MACConfigBuilder withAccumuloManagerJavaProperty(String key, String value) {
+            accumuloManagerJvmProperties.put(key, value);
+            return this;
+        }
+
         public MACConfig build() {
             if (this.baseDir == null) {
                 this.baseDir = new File(System.getProperty("java.io.tmpdir"), "mac-" + this.macId);
@@ -291,7 +304,8 @@ public class MACConfig {
                     siteConfig,
                     accumuloBindAddress,
                     zookeeperJvmProperties,
-                    accumuloGCJvmProperties
+                    accumuloGCJvmProperties,
+                    accumuloManagerJvmProperties
             );
         }
     }
