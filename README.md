@@ -23,7 +23,7 @@ the future.
 - [ ] Figure out the license
 - [ ] Add documentation
 - [ ] Support For:
-    - [ ] Existing Zookeeper
+    - [x] Existing Zookeeper
     - [ ] Mini HDFS(?)
     - [ ] JVM Settings
       - [ ] Zookeeper
@@ -33,22 +33,22 @@ the future.
     - [ ] Configuration File support
       - [ ] Zoo.cfg Configuration Overrides
       - [ ] accumulo-site.xml overrides
-- [ ] Automated tests for
+- [x] Automated tests for
   - [x] Custom Iterators (Native)
   - [x] Custom Iterators (Docker)
   - [x] Native MAC
   - [x] Docker MAC
   - [x] Docker Compose MAC
   - [x] Docker Compose Existing Zookeeper MAC
-  - [ ] Test Containers
+  - [x] Test Containers
 
 ## Application TODOs
 
 - [x] Create a configurable application that runs the library
 - [x] Create a docker image
 - [x] Auto figure-out version number in docker build
-- [ ] Confirm testing works with docker image.
-- [ ] Confirm testing works with native app.
+- [x] Confirm testing works with docker image.
+- [x] Confirm testing works with native app.
 - [ ] Publish the docker image
 - [ ] Add documentation
 - [ ] Add support for:
