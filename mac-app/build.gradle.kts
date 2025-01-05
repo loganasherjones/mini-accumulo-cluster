@@ -7,6 +7,7 @@ plugins {
     id("java")
     application
     id("com.bmuschko.docker-remote-api")
+    id("com.avast.gradle.docker-compose")
 }
 
 group = "com.loganasherjones"
@@ -30,6 +31,11 @@ dependencies {
     testImplementation(project(":test-client"))
 }
 
+dockerCompose {
+    isRequiredBy(tasks.test)
+    environment.put("PROJECT_VERSION", project.version.toString())
+}
+
 tasks.test {
     useJUnitPlatform()
     dependsOn(startDefaultContainer)
@@ -37,12 +43,13 @@ tasks.test {
 }
 
 val buildImageTask by tasks.creating(DockerBuildImage::class) {
+    val projectVersion = project.version.toString()
     dependsOn("distTar")
     dependsOn("compileTestJava")
     dependsOn("processTestResources")
-    buildArgs = mapOf("PROJECT_VERSION" to  project.version.toString())
+    buildArgs = mapOf("PROJECT_VERSION" to  projectVersion)
     inputDir = file(project.projectDir)
-    images.add("foo:latest")
+    images.add("loganasherjones/mini-accumulo-cluster:${projectVersion}")
 }
 
 

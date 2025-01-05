@@ -1,0 +1,10 @@
+services:
+  mac1:
+    image: "loganasherjones/mini-accumulo-cluster:${PROJECT_VERSION}"
+    environment:
+      MAC_ZOOKEEPER_PORT: 21812
+
+    volumes:
+      - ./build/iterators:/app/lib/ext
+    ports:
+      - "21812:21812"
