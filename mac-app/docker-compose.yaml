@@ -3,8 +3,22 @@ services:
     image: "loganasherjones/mini-accumulo-cluster:${PROJECT_VERSION}"
     environment:
       MAC_ZOOKEEPER_PORT: 21812
-
     volumes:
       - ./build/iterators:/app/lib/ext
     ports:
       - "21812:21812"
+
+  macExternalZk:
+    image: "loganasherjones/mini-accumulo-cluster:${PROJECT_VERSION}"
+    environment:
+      MAC_ZOOKEEPER_PORT: 2181
+      MAC_ZOOKEEPER_HOST: "zookeeper"
+    volumes:
+      - ./build/iterators:/app/lib/ext
+
+  zookeeper:
+    image: "zookeeper:3.7.2"
+    environment:
+      ZOO_4LW_COMMANDS_WHITELIST: "srvr,ruok"
+    ports:
+      - "2181:2181"

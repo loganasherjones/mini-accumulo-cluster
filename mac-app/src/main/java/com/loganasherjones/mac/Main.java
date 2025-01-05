@@ -1,11 +1,16 @@
 package com.loganasherjones.mac;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class Main {
+    private static final Logger log = LoggerFactory.getLogger(Main.class);
+
     public static void main(String[] args) throws IOException, InterruptedException {
         setupLogging();
         MACConfig config = generateConfig();
@@ -58,6 +63,12 @@ public class Main {
         int zookeeperPort = 21811;
         if (zookeeperPortStr != null && !zookeeperPortStr.isEmpty()) {
             zookeeperPort = Integer.parseInt(zookeeperPortStr);
+
+        }
+
+        String zookeeperHost = System.getenv("MAC_ZOOKEEPER_HOST");
+        if (zookeeperHost != null && !zookeeperHost.isEmpty()) {
+            builder.withZooKeeperHostname(zookeeperHost);
         }
 
         return builder

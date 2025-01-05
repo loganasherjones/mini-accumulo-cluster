@@ -118,8 +118,9 @@ public class MAC {
     }
 
     private void ensureZookeeperIsRunning() throws IOException, InterruptedException {
-        // TODO: Allow user to specify an existing zookeeper
-        startZookeeperProcess();
+        if (!config.useExistingZookeeper()) {
+            startZookeeperProcess();
+        }
         waitForZookeeperToBeOk();
     }
 

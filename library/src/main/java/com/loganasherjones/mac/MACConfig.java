@@ -159,6 +159,10 @@ public class MACConfig {
                 .replace(">", "&gt;");
     }
 
+    public boolean useExistingZookeeper() {
+        return !(zooKeeperHost.equals("localhost") || zooKeeperHost.equals("127.0.0.1"));
+    }
+
     public static class MACConfigBuilder {
 
         private String macId = UUID.randomUUID().toString();
