@@ -16,7 +16,6 @@ import java.util.Map;
 public class MACTest {
     @Test
     public void testStart() throws Exception {
-//        MiniAccumuloCluster cluster = new MiniAccumuloCluster(new File("/tmp/foo"), "supersecret");
         MACConfig config = new MACConfig.MACConfigBuilder().build();
         MAC cluster = new MAC(config);
         try {

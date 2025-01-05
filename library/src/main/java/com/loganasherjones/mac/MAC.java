@@ -26,6 +26,7 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,9 @@ public class MAC {
     private static final Logger log = LoggerFactory.getLogger(MAC.class);
 
     private final MACConfig config;
+    private final MACProcessSpawner spawner;
     private boolean initialized = false;
+    private final List<MACProcess> macProcesses = new ArrayList<>();
     private final Map<String, Process> processes = new HashMap<>();
     private final List<LogWriter> logWriters = new ArrayList<>();
 
@@ -45,6 +48,7 @@ public class MAC {
 
     public MAC(MACConfig config) {
         this.config = config;
+        this.spawner = new MACProcessSpawner(config.getClasspathLoader(), config.logToFiles(), config.getLogDir());
     }
 
     public String getInstanceName() {
@@ -60,7 +64,7 @@ public class MAC {
         return instance.getConnector(user, token);
     }
 
-    public ClientConfiguration getClientConfig() {
+    private ClientConfiguration getClientConfig() {
         return ClientConfiguration
                 .fromMap(config.getSiteConfig())
                 .withInstance(this.getInstanceName())
@@ -106,6 +110,10 @@ public class MAC {
             p.waitFor();
             log.debug("Process '{}' successfully stopped.", entry.getKey());
         }
+
+        for (MACProcess process : macProcesses) {
+            process.stop();
+        }
         log.info("Mini Accumulo Cluster stopped.");
     }
 
@@ -125,31 +133,13 @@ public class MAC {
     }
 
     private void startGarbageCollector() throws IOException {
-        // TODO: Add support for multiple tablet servers.
-        String javaHome = System.getProperty("java.home");
-        String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
-        String classpath = config.getClasspathLoader().getClasspath();
-        String className = SimpleGarbageCollector.class.getName();
-
         String processName = "mac-" + config.getMACId() + "-gc";
-        List<String> argList = new ArrayList<>(Arrays.asList(javaBin, "-Dproc=" + processName, "-cp", classpath));
-
-//        List<String> jvmOpts = new ArrayList<>();
-
-        // TODO: Allow the user to specify JVM Opts from the config.
-//        argList.addAll(jvmOpts);
-
-        argList.add(className);
-        addAddressArg(argList);
-//        argList.add(config.getZooCfgFile().getAbsolutePath());
-
-        ProcessBuilder builder = new ProcessBuilder(argList);
-
-        log.info("Starting Accumulo GC");
-        log.debug(String.join(" ", argList));
-        Process process = builder.start();
-        processes.put(processName, process);
-        captureOutput(processName, process);
+        MACProcess process = spawner.spawnProcess(
+                processName,
+                SimpleGarbageCollector.class.getName(),
+                getAccumuloAddressArgs()
+        );
+        macProcesses.add(process);
     }
 
 
@@ -368,6 +358,17 @@ public class MAC {
         }
         args.add("-a");
         args.add(address);
+    }
+
+    private List<String> getAccumuloAddressArgs() {
+        String address = config.getAccumuloBindAddress();
+        if (address == null || address.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<String> result = new ArrayList<>();
+        result.add("-a");
+        result.add(address);
+        return result;
     }
 
 }
