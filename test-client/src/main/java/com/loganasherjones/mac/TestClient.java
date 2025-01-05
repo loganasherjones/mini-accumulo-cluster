@@ -21,6 +21,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class TestClient {
     private static final Logger log = LoggerFactory.getLogger(TestClient.class);
@@ -140,13 +141,23 @@ public class TestClient {
         }
 
         assertEquals(4, count);
+        scanner.close();
 
         // Iterator Testing
         log.info("Testing custom iterator scanning.");
-        scanner = conn.createScanner(table, new Authorizations("A", "B"));
+        try {
+            customIteratorScan(conn);
+        } catch (Exception e) {
+            fail("Error occurred during iterator-base scanning: " + e.getMessage());
+        }
+    }
+
+    private void customIteratorScan(Connector conn) throws Exception {
+        log.info("Testing custom iterator scanning.");
+        Scanner scanner = conn.createScanner(table, new Authorizations("A", "B"));
         IteratorSetting exampleIteratorSetting = new IteratorSetting(11, "example", "com.loganasherjones.mac.ExampleIterator");
         scanner.addScanIterator(exampleIteratorSetting);
-        count = 0;
+        int count = 0;
         for (Map.Entry<Key, Value> ignored: scanner) {
             count++;
         }
