@@ -137,7 +137,8 @@ public class MAC {
         MACProcess process = spawner.spawnProcess(
                 processName,
                 SimpleGarbageCollector.class.getName(),
-                getAccumuloAddressArgs()
+                getAccumuloAddressArgs(),
+                config.getAccumuloGCJvmProperties()
         );
         macProcesses.add(process);
     }

@@ -26,10 +26,10 @@ the future.
     - [x] Existing Zookeeper
     - [ ] Mini HDFS(?)
     - [ ] JVM Settings
-      - [ ] Zookeeper
+      - [x] Zookeeper
       - [ ] Manager
       - [ ] Tablet Servers
-      - [ ] Garbage Collector
+      - [x] Garbage Collector
     - [ ] Configuration File support
       - [ ] Zoo.cfg Configuration Overrides
       - [ ] accumulo-site.xml overrides
