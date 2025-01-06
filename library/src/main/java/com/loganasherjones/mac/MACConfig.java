@@ -6,7 +6,11 @@ import org.apache.accumulo.server.util.PortUtils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.UUID;
 
 public class MACConfig {
 
@@ -214,7 +218,7 @@ public class MACConfig {
         private final Map<String, String> zookeeperJvmProperties = new HashMap<>() {{
             put("zookeeper.jmx.log4j.disable", "true");
         }};
-        private Map<String, String> siteXml = new HashMap<>() {{
+        private final Map<String, String> siteXml = new HashMap<>() {{
             put("tserver.memory.maps.native.enabled", "false");
             put("instance.secret", "alsonotsecure");
         }};
