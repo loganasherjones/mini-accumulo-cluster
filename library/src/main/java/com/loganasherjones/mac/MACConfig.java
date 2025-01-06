@@ -355,10 +355,9 @@ public class MACConfig {
 
             File accumuloData = new File(this.baseDir, "accumulo-data");
 
-            setPropertyIfNotSet("instance.dfs.dir", accumuloData.getAbsolutePath());
+            setPropertyIfNotSet("instance.volumes", accumuloData.toURI().toString());
             setPropertyIfNotSet("general.classpaths", libDir.getAbsolutePath() + "/[^.].*[.]jar");
             setPropertyIfNotSet("general.dynamic.classpaths", libExtDir.getAbsolutePath() + "/[^.].*[.]jar");
-            setPropertyIfNotSet("instance.dfs.uri", "file:///");
             setPropertyIfNotSet("instance.zookeeper.host", zooKeeperHost + ":" + zooKeeperPort);
 
             if (numTservers <= 0) {
