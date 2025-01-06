@@ -25,7 +25,6 @@ public class LogWriter extends Thread {
         safeToClose = out != System.err && out != System.out;
         this.in = new BufferedReader(new InputStreamReader(in));
         this.out = new BufferedWriter(new OutputStreamWriter(out));
-        flushEverySecond();
     }
 
     private void flushEverySecond() {
@@ -48,6 +47,7 @@ public class LogWriter extends Thread {
 
     @Override
     public void run() {
+        flushEverySecond();
         String line;
 
         try {
