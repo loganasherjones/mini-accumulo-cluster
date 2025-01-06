@@ -34,6 +34,7 @@ public class MAC {
     private final MACConfig config;
     private final MACProcessSpawner spawner;
     private boolean initialized = false;
+    private boolean stopped = true;
     private final List<MACProcess> macProcesses = new ArrayList<>();
 
     public MAC() {
@@ -70,30 +71,42 @@ public class MAC {
             log.warn("start called on an already started MAC.");
             return;
         }
-        // TODO: Add thread safeness here
 
-        log.info("Starting Mini Accumulo Cluster");
-        config.createDirectoryStructure();
+        synchronized (this) {
+            if (!initialized) {
+                log.info("Starting Mini Accumulo Cluster");
+                config.createDirectoryStructure();
 
-        ensureStopIsCalled();
-        ensureZookeeperIsRunning();
-        initializeAccumulo();
-        startTabletServers();
-        setManagerGoalState();
-        startManager();
-        startGarbageCollector();
+                ensureStopIsCalled();
+                ensureZookeeperIsRunning();
+                initializeAccumulo();
+                startTabletServers();
+                setManagerGoalState();
+                startManager();
+                startGarbageCollector();
 
-        initialized = true;
+                initialized = true;
+            }
+        }
         log.info("Mini Accumulo Cluster Started successfully");
     }
 
     public void stop() throws IOException, InterruptedException {
-        // TODO: Add thread-safeness here.
-        log.info("Stopping Mini Accumulo Cluster");
-        for (MACProcess process : macProcesses) {
-            process.stop();
+        if (stopped) {
+            log.warn("Stop called multiple times. Ignoring.");
+            return;
         }
-        log.info("Mini Accumulo Cluster stopped.");
+
+        synchronized (this) {
+            if (!stopped) {
+                log.info("Stopping Mini Accumulo Cluster");
+                for (MACProcess process : macProcesses) {
+                    process.stop();
+                }
+                log.info("Mini Accumulo Cluster stopped.");
+            }
+            stopped = true;
+        }
     }
 
     public void runShell() throws IOException {
