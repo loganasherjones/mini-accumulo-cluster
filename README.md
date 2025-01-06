@@ -14,46 +14,15 @@ testing.
 At the moment, only 1.10.X is supported with the intent of supporting 2.X in
 the future.
 
-## Library TODOs
+## TODOs:
 
-- [x] Make the basics work
-- [ ] Make logging good
-- [ ] Figure out publishing
-- [ ] Play with GitHub Actions/Workflows
-- [ ] Figure out the license
-- [ ] Add documentation
-- [x] Support For:
-    - [x] Existing Zookeeper
-    - [x] JVM Settings
-      - [x] Zookeeper
-      - [x] Manager
-      - [x] Tablet Servers
-      - [x] Garbage Collector
-    - [x] Configuration File support
-      - [x] Zoo.cfg Configuration Overrides
-      - [x] accumulo-site.xml overrides
-- [x] Automated tests for
-  - [x] Custom Iterators (Native)
-  - [x] Custom Iterators (Docker)
-  - [x] Native MAC
-  - [x] Docker MAC
-  - [x] Docker Compose MAC
-  - [x] Docker Compose Existing Zookeeper MAC
-  - [x] Test Containers
-
-## Application TODOs
-
-- [x] Create a configurable application that runs the library
-- [x] Create a docker image
-- [x] Auto figure-out version number in docker build
-- [x] Confirm testing works with docker image.
-- [x] Confirm testing works with native app.
-- [ ] Publish the docker image
-- [ ] Add documentation
-- [ ] Add support for:
-  - [ ] Log Level Support
-      - [ ] Root / ZK / Accumulo / MAC
-  - [ ] Auto Schema Creation
+- [ ] Setup License
+- [ ] Publish library
+- [ ] Publish Docker Image
+- [ ] Documentation in the README
+- [ ] Auto Schema Creation
+- [ ] Create 2.X Version
+- [ ] Create 3.X Version
 
 ## Java Usage
 
