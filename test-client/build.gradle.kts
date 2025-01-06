@@ -9,6 +9,10 @@ repositories {
     mavenCentral()
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+}
+
 dependencies {
     implementation("org.apache.accumulo:accumulo-core:${project.property("accumuloVersion")}")
     implementation(platform("org.junit:junit-bom:5.10.0"))
