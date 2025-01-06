@@ -32,7 +32,7 @@ the future.
       - [x] Garbage Collector
     - [ ] Configuration File support
       - [ ] Zoo.cfg Configuration Overrides
-      - [ ] accumulo-site.xml overrides
+      - [x] accumulo-site.xml overrides
 - [x] Automated tests for
   - [x] Custom Iterators (Native)
   - [x] Custom Iterators (Docker)

@@ -1,5 +1,6 @@
 package com.loganasherjones.mac;
 
+import org.apache.accumulo.core.conf.Property;
 import org.apache.accumulo.server.util.PortUtils;
 
 import java.io.File;
@@ -213,6 +214,10 @@ public class MACConfig {
         private final Map<String, String> zookeeperJvmProperties = new HashMap<>() {{
             put("zookeeper.jmx.log4j.disable", "true");
         }};
+        private Map<String, String> siteXml = new HashMap<>() {{
+            put("tserver.memory.maps.native.enabled", "false");
+            put("instance.secret", "alsonotsecure");
+        }};
         private int numTservers = 2;
 
         public MACConfigBuilder withInstanceName(String s) {
@@ -290,6 +295,11 @@ public class MACConfig {
             return this;
         }
 
+        public MACConfigBuilder withAccumuloSiteProperty(Property property, String value) {
+            siteXml.put(property.getKey(), value);
+            return this;
+        }
+
         public MACConfig build() {
             if (this.baseDir == null) {
                 this.baseDir = new File(System.getProperty("java.io.tmpdir"), "mac-" + this.macId);
@@ -305,14 +315,11 @@ public class MACConfig {
 
             File accumuloData = new File(this.baseDir, "accumulo-data");
 
-            Map<String, String> siteConfig = new HashMap<>();
-            siteConfig.put("instance.dfs.dir", accumuloData.getAbsolutePath());
-            siteConfig.put("general.classpaths", libDir.getAbsolutePath() + "/[^.].*[.]jar");
-            siteConfig.put("general.dynamic.classpaths", libExtDir.getAbsolutePath() + "/[^.].*[.]jar");
-            siteConfig.put("instance.dfs.uri", "file:///");
-            siteConfig.put("tserver.memory.maps.native.enabled", "false");
-            siteConfig.put("instance.secret", "alsonotsecure");
-            siteConfig.put("instance.zookeeper.host", zooKeeperHost + ":" + zooKeeperPort);
+            setPropertyIfNotSet("instance.dfs.dir", accumuloData.getAbsolutePath());
+            setPropertyIfNotSet("general.classpaths", libDir.getAbsolutePath() + "/[^.].*[.]jar");
+            setPropertyIfNotSet("general.dynamic.classpaths", libExtDir.getAbsolutePath() + "/[^.].*[.]jar");
+            setPropertyIfNotSet("instance.dfs.uri", "file:///");
+            setPropertyIfNotSet("instance.zookeeper.host", zooKeeperHost + ":" + zooKeeperPort);
 
             if (numTservers <= 0) {
                 throw new IllegalArgumentException("numTservers must be greater than 0");
@@ -328,7 +335,7 @@ public class MACConfig {
                     baseDir,
                     this.zooKeeperHost,
                     this.zooKeeperPort,
-                    siteConfig,
+                    siteXml,
                     accumuloBindAddress,
                     zookeeperJvmProperties,
                     accumuloGCJvmProperties,
@@ -337,5 +344,12 @@ public class MACConfig {
                     numTservers
             );
         }
+
+        private void setPropertyIfNotSet(String key, String value) {
+            if (!siteXml.containsKey(key)) {
+                siteXml.put(key, value);
+            }
+        }
     }
+
 }
