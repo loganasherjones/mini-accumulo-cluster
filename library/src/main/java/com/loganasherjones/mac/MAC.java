@@ -152,7 +152,8 @@ public class MAC {
         MACProcess process = spawner.spawnProcess(
                 processName,
                 SetGoalState.class.getName(),
-                Collections.singletonList(MasterGoalState.NORMAL.toString())
+                Collections.singletonList(MasterGoalState.NORMAL.toString()),
+                config.getAccumuloInitJvmProperties()
         );
         int retCode = process.waitFor();
         if (retCode != 0) {
@@ -208,7 +209,8 @@ public class MAC {
         MACProcess process = spawner.spawnProcess(
                 processName,
                 Initialize.class.getName(),
-                additionalArgs
+                additionalArgs,
+                config.getAccumuloInitJvmProperties()
         );
         int retCode = process.waitFor();
         if (retCode != 0) {

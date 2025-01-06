@@ -47,6 +47,7 @@ public class MACConfig {
             Map<String, String> accumuloGCJvmProperties,
             Map<String, String> accumuloManagerJvmProperties,
             Map<String, String> accumuloTserverJvmProperties,
+            Map<String, String> accumuloInitJvmProperties,
             int numTservers,
             Map<String, String> zooCfg
     ) {
@@ -67,6 +68,7 @@ public class MACConfig {
         this.jvmProperties.put("gc", accumuloGCJvmProperties);
         this.jvmProperties.put("manager", accumuloManagerJvmProperties);
         this.jvmProperties.put("tserver", accumuloTserverJvmProperties);
+        this.jvmProperties.put("init", accumuloInitJvmProperties);
         this.numTservers = numTservers;
         this.zooCfg = zooCfg;
     }
@@ -205,6 +207,10 @@ public class MACConfig {
         return numTservers;
     }
 
+    public Map<String, String> getAccumuloInitJvmProperties() {
+        return jvmProperties.get("init");
+    }
+
     public static class MACConfigBuilder {
 
         private String macId = UUID.randomUUID().toString();
@@ -220,6 +226,7 @@ public class MACConfig {
         private final Map<String, String> accumuloGCJvmProperties = new HashMap<>();
         private final Map<String, String> accumuloManagerJvmProperties = new HashMap<>();
         private final Map<String, String> accumuloTserverJvmProperties = new HashMap<>();
+        private final Map<String, String> accumuloInitJvmProperties = new HashMap<>();
         private final Map<String, String> zookeeperJvmProperties = new HashMap<>() {{
             put("zookeeper.jmx.log4j.disable", "true");
         }};
@@ -305,6 +312,11 @@ public class MACConfig {
             return this;
         }
 
+        public MACConfigBuilder withAccumuloInitJavaProperty(String key, String value) {
+            accumuloInitJvmProperties.put(key, value);
+            return this;
+        }
+
         public MACConfigBuilder withNumTservers(int num) {
             this.numTservers = num;
             return this;
@@ -363,6 +375,7 @@ public class MACConfig {
                     accumuloGCJvmProperties,
                     accumuloManagerJvmProperties,
                     accumuloTserverJvmProperties,
+                    accumuloInitJvmProperties,
                     numTservers,
                     zooCfg
             );
