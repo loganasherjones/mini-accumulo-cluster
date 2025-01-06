@@ -71,9 +71,13 @@ public class Main {
             builder.withZooKeeperHostname(zookeeperHost);
         }
 
+        String fileLogging = System.getenv("MAC_FILE_LOGGING");
+        if (fileLogging != null && fileLogging.equalsIgnoreCase("true")) {
+            builder.withFileLogging();
+        }
+
         return builder
                 .withStaticZooKeeperPort(zookeeperPort)
-                .withFileLogging() // TODO: Make this configurable
                 .build();
     }
 
