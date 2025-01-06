@@ -35,11 +35,7 @@ public class Main {
     }
 
     private static void setupLogging() {
-        String rootLogLevel = System.getenv("ROOT_LOG_LEVEL");
-        if (rootLogLevel == null || rootLogLevel.isEmpty()) {
-            rootLogLevel = "ERROR";
-        }
-        System.setProperty("root_log_level", rootLogLevel);
+        System.setProperty("root_log_level", getRootLogLevel());
 
         String macLogLevel = System.getenv("MAC_LOG_LEVEL");
         if (macLogLevel == null || macLogLevel.isEmpty()) {
@@ -48,11 +44,21 @@ public class Main {
         System.setProperty("mac_log_level", macLogLevel);
     }
 
+    private static String getRootLogLevel() {
+        String rootLogLevel = System.getenv("ROOT_LOG_LEVEL");
+        if (rootLogLevel == null || rootLogLevel.isEmpty()) {
+            rootLogLevel = "ERROR";
+        }
+        return rootLogLevel;
+    }
+
     private static MACConfig generateConfig() throws UnknownHostException {
         MACConfig.MACConfigBuilder builder = new MACConfig.MACConfigBuilder();
         if (isInContainer()) {
             builder.withAccumuloBindAddress(InetAddress.getLocalHost().getHostAddress());
         }
+
+        builder.withGlobalJavaProperty("root_log_level", getRootLogLevel());
 
         String baseDir = System.getenv("MAC_BASE_DIR");
         if (baseDir != null && !baseDir.isEmpty()) {

@@ -332,6 +332,14 @@ public class MACConfig {
             return this;
         }
 
+        public MACConfigBuilder withGlobalJavaProperty(String key, String value) {
+            withAccumuloGCJavaProperty(key, value);
+            withAccumuloManagerJavaProperty(key, value);
+            withAccumuloTServerJavaProperty(key, value);
+            withAccumuloInitJavaProperty(key, value);
+            return withZookeeperJavaProperty(key, value);
+        }
+
         public MACConfig build() {
             if (this.baseDir == null) {
                 this.baseDir = new File(System.getProperty("java.io.tmpdir"), "mac-" + this.macId);
