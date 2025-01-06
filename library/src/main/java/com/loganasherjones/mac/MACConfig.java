@@ -227,18 +227,30 @@ public class MACConfig {
         private final Map<String, String> accumuloManagerJvmProperties = new HashMap<>();
         private final Map<String, String> accumuloTserverJvmProperties = new HashMap<>();
         private final Map<String, String> accumuloInitJvmProperties = new HashMap<>();
-        private final Map<String, String> zookeeperJvmProperties = new HashMap<>() {{
-            put("zookeeper.jmx.log4j.disable", "true");
-        }};
-        private final Map<String, String> siteXml = new HashMap<>() {{
-            put("tserver.memory.maps.native.enabled", "false");
-            put("instance.secret", "alsonotsecure");
-        }};
-        private final Map<String, String> zooCfg = new HashMap<>() {{
-            put("tickTime", "2000");
-            put("maxClientCnxns", "1000");
-            put("4lw.commands.whitelist", "srvr,ruok");
-        }};
+
+        private final Map<String, String> zookeeperJvmProperties = initialZookeeperJvmProperties();
+        private static Map<String, String> initialZookeeperJvmProperties() {
+            Map<String, String> result = new HashMap<>();
+            result.put("zookeeper.jmx.log4j.disable", "true");
+            return result;
+        }
+
+        private final Map<String, String> siteXml = initialSiteXml();
+        private static Map<String, String> initialSiteXml() {
+            Map<String, String> result = new HashMap<>();
+            result.put("tserver.memory.maps.native.enabled", "false");
+            result.put("instance.secret", "alsonotsecure");
+            return result;
+
+        }
+        private final Map<String, String> zooCfg = initialZooCfg();
+        private static Map<String, String> initialZooCfg() {
+            Map<String, String> result = new HashMap<>();
+            result.put("tickTime", "2000");
+            result.put("maxClientCnxns", "1000");
+            result.put("4lw.commands.whitelist", "srvr,ruok");
+            return result;
+        };
 
         private int numTservers = 2;
 

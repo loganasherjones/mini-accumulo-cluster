@@ -9,6 +9,11 @@ repositories {
     mavenCentral()
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
 dependencies {
     implementation("org.apache.accumulo:accumulo-minicluster:${project.property("accumuloVersion")}")
     implementation("org.apache.zookeeper:zookeeper:3.7.2")

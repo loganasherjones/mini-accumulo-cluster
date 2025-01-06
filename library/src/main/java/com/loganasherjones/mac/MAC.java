@@ -171,9 +171,8 @@ public class MAC {
 
     private void startTabletServer(int num) throws IOException {
         String processName = "mac-" + config.getMACId() + "-tserver-" + num;
-        Map<String, String> env = new HashMap<>() {{
-            put("ACCUMULO_HOME", config.getBaseDirectory().getAbsolutePath());
-        }};
+        Map<String, String> env = new HashMap<>();
+        env.put("ACCUMULO_HOME", config.getBaseDirectory().getAbsolutePath());
         MACProcess process = spawner.spawnProcess(
                 processName,
                 TabletServer.class.getName(),
