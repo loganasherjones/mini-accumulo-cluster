@@ -22,16 +22,15 @@ the future.
 - [ ] Play with GitHub Actions/Workflows
 - [ ] Figure out the license
 - [ ] Add documentation
-- [ ] Support For:
+- [x] Support For:
     - [x] Existing Zookeeper
-    - [ ] Mini HDFS(?)
     - [x] JVM Settings
       - [x] Zookeeper
       - [x] Manager
       - [x] Tablet Servers
       - [x] Garbage Collector
-    - [ ] Configuration File support
-      - [ ] Zoo.cfg Configuration Overrides
+    - [x] Configuration File support
+      - [x] Zoo.cfg Configuration Overrides
       - [x] accumulo-site.xml overrides
 - [x] Automated tests for
   - [x] Custom Iterators (Native)

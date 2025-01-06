@@ -29,6 +29,7 @@ public class MACConfig {
     private final String accumuloBindAddress;
     private final Map<String, Map<String, String>> jvmProperties = new HashMap<>();
     private final int numTservers;
+    private final Map<String, String> zooCfg;
 
     private MACConfig(
             String instanceName,
@@ -46,7 +47,8 @@ public class MACConfig {
             Map<String, String> accumuloGCJvmProperties,
             Map<String, String> accumuloManagerJvmProperties,
             Map<String, String> accumuloTserverJvmProperties,
-            int numTservers
+            int numTservers,
+            Map<String, String> zooCfg
     ) {
         this.instanceName = instanceName;
         this.rootPassword = rootPassword;
@@ -66,6 +68,7 @@ public class MACConfig {
         this.jvmProperties.put("manager", accumuloManagerJvmProperties);
         this.jvmProperties.put("tserver", accumuloTserverJvmProperties);
         this.numTservers = numTservers;
+        this.zooCfg = zooCfg;
     }
 
     public String getInstanceName() {
@@ -152,13 +155,15 @@ public class MACConfig {
         File zooCfgFile = new File(configDirectory, "zoo.cfg");
         if (!zooCfgFile.exists()) {
             FileWriter fw = new FileWriter(zooCfgFile);
-            Properties zooCfg = new Properties();
-            zooCfg.setProperty("clientPort", Integer.toString(getZooKeeperPort()));
-            zooCfg.setProperty("dataDir", configDirectory.getAbsolutePath());
-            zooCfg.setProperty("tickTime", "2000");
-            zooCfg.setProperty("maxClientCnxns", "1000");
-            zooCfg.setProperty("4lw.commands.whitelist", "*");
-            zooCfg.store(fw, null);
+            if (!zooCfg.containsKey("clientPort")) {
+                zooCfg.put("clientPort", Integer.toString(getZooKeeperPort()));
+            }
+            Properties zooCfgProps = new Properties();
+            for (Map.Entry<String, String> entry : zooCfg.entrySet()) {
+                zooCfgProps.setProperty(entry.getKey(), entry.getValue());
+            }
+            zooCfgProps.store(fw, null);
+            fw.close();
         }
 
         File siteXml = new File(configDirectory, "accumulo-site.xml");
@@ -222,6 +227,12 @@ public class MACConfig {
             put("tserver.memory.maps.native.enabled", "false");
             put("instance.secret", "alsonotsecure");
         }};
+        private final Map<String, String> zooCfg = new HashMap<>() {{
+            put("tickTime", "2000");
+            put("maxClientCnxns", "1000");
+            put("4lw.commands.whitelist", "srvr,ruok");
+        }};
+
         private int numTservers = 2;
 
         public MACConfigBuilder withInstanceName(String s) {
@@ -304,6 +315,11 @@ public class MACConfig {
             return this;
         }
 
+        public MACConfigBuilder withZookeeperProperty(String key, String value) {
+            zooCfg.put(key, value);
+            return this;
+        }
+
         public MACConfig build() {
             if (this.baseDir == null) {
                 this.baseDir = new File(System.getProperty("java.io.tmpdir"), "mac-" + this.macId);
@@ -329,6 +345,8 @@ public class MACConfig {
                 throw new IllegalArgumentException("numTservers must be greater than 0");
             }
 
+            zooCfg.put("dataDir", confDir.getAbsolutePath());
+
             return new MACConfig(
                     this.instanceName,
                     this.rootPassword,
@@ -345,7 +363,8 @@ public class MACConfig {
                     accumuloGCJvmProperties,
                     accumuloManagerJvmProperties,
                     accumuloTserverJvmProperties,
-                    numTservers
+                    numTservers,
+                    zooCfg
             );
         }
 
