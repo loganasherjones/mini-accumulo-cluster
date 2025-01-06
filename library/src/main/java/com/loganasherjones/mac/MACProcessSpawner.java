@@ -15,6 +15,9 @@ import java.util.Map;
 
 /**
  * A helper class for spawning processes for the mini-accumulo-cluster.
+ *
+ * @author loganasherjones
+ * @since 1.10.4
  */
 public class MACProcessSpawner {
     private static final Logger log = LoggerFactory.getLogger(MACProcessSpawner.class);
@@ -25,12 +28,30 @@ public class MACProcessSpawner {
     private final boolean logToFile;
     private final File logDirectory;
 
+    /**
+     * Create a MACProcessSpawner.
+     *
+     * @param classpathLoader used to determine arg to -cp
+     * @param logToFile determines if logs are sent to stdout/stderr or a file
+     * @param logDirectory if {@link #logToFile} is false ignored, otherwise logs will be written in this directory.
+     */
     public MACProcessSpawner(ClasspathLoader classpathLoader, boolean logToFile, File logDirectory) {
         this.classpathLoader = classpathLoader;
         this.logToFile = logToFile;
         this.logDirectory = logDirectory;
     }
 
+    /**
+     * Spawn a java process.
+     *
+     * @param processName name of the process (will be passed as a system property)
+     * @param className fully-qualified name of the class to run as main
+     * @param additionalArgs args to the class itself
+     * @param jvmProperties jvm properties to add to the command
+     * @return the spawned {@link MACProcess}
+     * @throws IOException - if the classpath can't be loaded correctly.
+     * @since 1.10.4
+     */
     public MACProcess spawnProcess(
             String processName,
             String className,
@@ -46,6 +67,18 @@ public class MACProcessSpawner {
         );
     }
 
+    /**
+     * Spawn a java process.
+     *
+     * @param processName name of the process (will be passed as a system property)
+     * @param className fully-qualified name of the class to run as main
+     * @param additionalArgs args to the class itself
+     * @param jvmProperties jvm properties to add to the command
+     * @param environment environment variables to set
+     * @return the spawned {@link MACProcess}
+     * @throws IOException - if the classpath can't be loaded correctly.
+     * @since 1.10.4
+     */
     public MACProcess spawnProcess(
             String processName,
             String className,

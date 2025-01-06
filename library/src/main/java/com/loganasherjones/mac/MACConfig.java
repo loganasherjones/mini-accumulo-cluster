@@ -12,6 +12,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
+/**
+ * Configuration for the {@link MAC}.
+ */
 public class MACConfig {
 
     private final String instanceName;
@@ -142,6 +145,12 @@ public class MACConfig {
         return jvmProperties.get("gc");
     }
 
+    /**
+     * Creates directory structure of the configuration.
+     * This gets called automatically by {@link MAC#start()}.
+     *
+     * @throws IOException - If there is a problem creating a directory.
+     */
     public void createDirectoryStructure() throws IOException {
         if (!this.baseDirectory.exists()) {
             this.baseDirectory.mkdirs();

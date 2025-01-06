@@ -27,6 +27,35 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A Mini Accumulo Cluster suitable for integration tests.
+ *
+ * <p>
+ *     This class spawns all the necessary processes to run several Accumulo
+ *     processes. The main use-case for this class is integration tests.
+ * </p>
+ *
+ * <p>
+ *     The simplest possible usage is:
+ * </p>
+ *
+ * <pre>
+ * @Test
+ * public void myTest() {
+ *     // Create mac with default configuration.
+ *     MAC mac = new MAC();
+ *     // Spawn the server.
+ *     mac.start();
+ *     Connector rootConnector = mac.getRootConnector();
+ *     // Do whatever with the rootConnector
+ *     mac.stop();
+ * }
+ * </pre>
+ *
+ * There are many configuration options. See the {@link MACConfig.MACConfigBuilder}
+ *
+ * @author loganasherjones
+ */
 public class MAC {
 
     private static final Logger log = LoggerFactory.getLogger(MAC.class);
@@ -37,23 +66,49 @@ public class MAC {
     private boolean stopped = false;
     private final List<MACProcess> macProcesses = new ArrayList<>();
 
+    /**
+     * Create a new Mini Accumulo Cluster with the default configuration.
+     * @since 1.10.4
+     */
     public MAC() {
         this(new MACConfig.MACConfigBuilder().build());
     }
 
+    /**
+     * Create a Mini Accumulo Cluster with the specified configuration.
+     *
+     * @param config - configuration to use.
+     * @since 1.10.4
+     */
     public MAC(MACConfig config) {
         this.config = config;
         this.spawner = new MACProcessSpawner(config.getClasspathLoader(), config.logToFiles(), config.getLogDir());
     }
 
+    /**
+     * Get the zookeeper instance name.
+     * @return the zookeeper instance name.
+     * @since 1.10.4
+     */
     public String getInstanceName() {
         return this.config.getInstanceName();
     }
 
+    /**
+     * Get the zookeeper connection string.
+     * @return the zookeeper connection string.
+     * @since 1.10.4
+     */
     public String getZooKeepers() {
         return config.getZooKeeperHost() + ":" + config.getZooKeeperPort();
     }
 
+    /**
+     * Get an {@link Connector} for the specified user/password.
+     *
+     * @see ZooKeeperInstance#getConnector(String, AuthenticationToken)
+     * @since 1.10.4
+     */
     public Connector getConnector(String user, AuthenticationToken token) throws AccumuloException, AccumuloSecurityException {
         Instance instance = new ZooKeeperInstance(getClientConfig());
         return instance.getConnector(user, token);
@@ -66,6 +121,11 @@ public class MAC {
                 .withZkHosts(this.getZooKeepers());
     }
 
+    /**
+     * Spawn a mini-accumulo cluster.
+     * @throws Exception if something goes wrong.
+     * @since 1.10.4
+     */
     public void start() throws Exception {
         if (initialized) {
             log.warn("start called on an already started MAC.");
@@ -91,6 +151,13 @@ public class MAC {
         log.info("Mini Accumulo Cluster Started successfully");
     }
 
+    /**
+     * Stops the mini-accumulo-cluster.
+     *
+     * @throws IOException - if something goes wrong.
+     * @throws InterruptedException - if interrupted while stopping.
+     * @since 1.10.4
+     */
     public void stop() throws IOException, InterruptedException {
         if (stopped) {
             log.warn("Stop called multiple times. Ignoring.");
@@ -109,6 +176,13 @@ public class MAC {
         }
     }
 
+    /**
+     * Spawns an accumulo shell to the current mini-accumulo-cluster.
+     * This is mostly intended for debugging purposes.
+     *
+     * @throws IOException - if something goes wrong.
+     * @since 1.10.4
+     */
     public void runShell() throws IOException {
         String[] shellArgs = new String[]{"-u", "root", "-p", config.getRootPassword(), "-zi", config.getInstanceName(), "-zh", config.getZooKeeperHost() + ":" + config.getZooKeeperPort()};
         Shell shell = new Shell();

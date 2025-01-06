@@ -12,6 +12,16 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
+/**
+ * A class for writing logs from a subprocess.
+ * <p>
+ * This code was taken mostly from Accumulo, but then modified to allow
+ * it to work safely with both log files and to stdout/stderr.
+ * </p>
+ *
+ * @author loganasherjones
+ * @since 1.10.4
+ */
 public class LogWriter extends Thread {
 
     private static final Logger log = LoggerFactory.getLogger(LogWriter.class);
@@ -20,6 +30,22 @@ public class LogWriter extends Thread {
     private BufferedWriter out;
     private final boolean safeToClose;
 
+    /**
+     * Create a LogWriter Thread.
+     * <p>
+     *     Generally, you'll want a LogWriter for both stdout and stderr
+     *     for a process.
+     * </p>
+     *
+     * <p>
+     *     Note that when this thread stops being able to read from the
+     *     input it will try to close the output if it is not stdout/stderr.
+     * </p>
+     *
+     * @param in - An input stream from a process. (stdout/stderr)
+     * @param out - An output stream to send the input stream to.
+     * @since 1.10.4
+     */
     public LogWriter(InputStream in, OutputStream out) {
         this.setDaemon(true);
         safeToClose = out != System.err && out != System.out;
@@ -39,12 +65,23 @@ public class LogWriter extends Thread {
                 1000, 1000);
     }
 
+    /**
+     * Forces a flush of any buffer contents to {@link #out}.
+     *
+     * @throws IOException if something goes wrong with the flush.
+     * @since 1.10.4
+     */
     public synchronized void flush() throws IOException {
         if (out != null) {
             out.flush();
         }
     }
 
+    /**
+     * Begin forwarding input to output.
+     *
+     * @since 1.10.4
+     */
     @Override
     public void run() {
         flushEverySecond();

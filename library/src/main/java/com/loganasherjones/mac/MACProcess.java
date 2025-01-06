@@ -6,7 +6,13 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 /**
- * A wrapper for a process that handles closing the LogWriters.
+ * A wrapper for a process which includes capture of stdout/stderr.
+ * <p>
+ * Expected to be used internally. Not a safe API to depend on.
+ * </p>
+ *
+ * @author loganasherjones
+ * @since 1.10.4
  */
 public class MACProcess {
     private static final Logger log = LoggerFactory.getLogger(MACProcess.class);
@@ -23,6 +29,13 @@ public class MACProcess {
         this.outLogWriter = outLogWriter;
     }
 
+    /**
+     * Stop the wrapped process and flush stdout/stderr to their outputs.
+     *
+     * @throws IOException - If something goes wrong writing output.
+     * @throws InterruptedException - If interrupted while waiting for process to die.
+     * @since 1.10.4
+     */
     public void stop() throws IOException, InterruptedException {
         log.debug("Flushing stderr for {}", processName);
         this.errLogWriter.flush();
@@ -36,6 +49,9 @@ public class MACProcess {
         log.debug("Process {} stopped (return={})", processName, retCode);
     }
 
+    /**
+     * @see Process#waitFor()
+     */
     public int waitFor() throws InterruptedException {
         return process.waitFor();
     }

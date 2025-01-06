@@ -14,12 +14,27 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Default Implementation for the {@link ClasspathLoader}.
+ * <p>
+ * This class was mostly lifted as-is from the accumulo source code.
+ * The only minor changes is that it is slightly cleaned up and allows
+ * users to specify extra classpath directories to load by default.
+ * </p>
+ * @author loganasherjones
+ * @since 1.10.4
+ */
 public class DefaultClasspathLoader implements ClasspathLoader {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultClasspathLoader.class);
 
     private final List<String> extraClasspath;
 
+    /**
+     * Create a default classpath loader.
+     * @param extraClasspath - Additional classpath entries to include in the -cp flag.
+     * @since 1.10.4
+     */
     public DefaultClasspathLoader(List<String> extraClasspath) {
         this.extraClasspath = extraClasspath;
     }
