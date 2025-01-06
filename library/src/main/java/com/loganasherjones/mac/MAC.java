@@ -34,7 +34,7 @@ public class MAC {
     private final MACConfig config;
     private final MACProcessSpawner spawner;
     private boolean initialized = false;
-    private boolean stopped = true;
+    private boolean stopped = false;
     private final List<MACProcess> macProcesses = new ArrayList<>();
 
     public MAC() {
