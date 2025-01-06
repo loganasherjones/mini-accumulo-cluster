@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class TestClient {
@@ -123,7 +122,7 @@ public class TestClient {
             } else if (entry.getKey().getColumnQualifierData().toString().equals("CRC")) {
                 assertEquals("123", entry.getValue().toString());
             } else {
-                assertTrue(false);
+                fail("Got an unexpected key " + entry.getKey());
             }
             count++;
         }
@@ -144,7 +143,6 @@ public class TestClient {
         scanner.close();
 
         // Iterator Testing
-        log.info("Testing custom iterator scanning.");
         try {
             customIteratorScan(conn);
         } catch (Exception e) {

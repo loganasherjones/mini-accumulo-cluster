@@ -1,17 +1,12 @@
 package com.loganasherjones.mac;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class Main {
-    private static final Logger log = LoggerFactory.getLogger(Main.class);
-
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException {
         setupLogging();
         MACConfig config = generateConfig();
         MAC mac = new MAC(config);

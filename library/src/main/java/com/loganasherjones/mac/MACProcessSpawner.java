@@ -34,20 +34,6 @@ public class MACProcessSpawner {
     public MACProcess spawnProcess(
             String processName,
             String className,
-            List<String> additionalArgs
-    ) throws IOException {
-        return spawnProcess(
-                processName,
-                className,
-                additionalArgs,
-                new HashMap<>(),
-                new HashMap<>()
-        );
-    }
-
-    public MACProcess spawnProcess(
-            String processName,
-            String className,
             List<String> additionalArgs,
             Map<String, String> jvmProperties
     ) throws IOException {
