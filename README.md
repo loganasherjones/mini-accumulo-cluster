@@ -16,7 +16,6 @@ the future.
 
 ## TODOs:
 
-- [ ] Setup License
 - [ ] Publish library
 - [ ] Publish Docker Image
 - [ ] Documentation in the README
