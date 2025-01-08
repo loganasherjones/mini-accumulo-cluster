@@ -13,7 +13,11 @@ import java.util.Properties;
 import java.util.UUID;
 
 /**
- * Configuration for the {@link MAC}.
+ * Configuration for the {@link MAC}. To construct this object use
+ * the {@link MACConfigBuilder}
+ *
+ * @author loganasherjones
+ * @since 1.10.4
  */
 public class MACConfig {
 
@@ -220,13 +224,22 @@ public class MACConfig {
         return jvmProperties.get("init");
     }
 
+    /**
+     * Builds the {@link MACConfig} object for initializing {@link MAC}
+     *
+     * The default should work out of the box for integration testing, but
+     * see the various methods for possible configuration options.
+     *
+     * @author loganasherjones
+     * @since 1.10.4
+     */
     public static class MACConfigBuilder {
 
         private String macId = UUID.randomUUID().toString();
         private String instanceName = "default";
         private String rootPassword = "notsecure";
         private ClasspathLoader classpathLoader = null;
-        private File baseDir = null;
+        private File baseDirectory = null;
         private boolean logToFile = false;
         private String zooKeeperHost = "127.0.0.1";
         private int zooKeeperPort = -1;
@@ -263,96 +276,292 @@ public class MACConfig {
 
         private int numTservers = 2;
 
-        public MACConfigBuilder withInstanceName(String s) {
-            this.instanceName = s;
+        /**
+         * Sets the instance name the accumulo cluster will use.
+         *
+         * @param instanceName - The accumulo instance name
+         * @return this
+         * @since 1.10.4
+         */
+        public MACConfigBuilder withInstanceName(String instanceName) {
+            this.instanceName = instanceName;
             return this;
         }
 
-        public MACConfigBuilder withRootPassword(String s) {
-            this.rootPassword = s;
+        /**
+         * Set the initial root password for the accumulo 'root' user.
+         *
+         * @param rootPassword - The 'root' accumulo password.
+         * @return this
+         * @since 1.10.4
+         */
+        public MACConfigBuilder withRootPassword(String rootPassword) {
+            this.rootPassword = rootPassword;
             return this;
         }
 
-        public MACConfigBuilder withClasspathLoader(ClasspathLoader cpl) {
-            this.classpathLoader = cpl;
+        /**
+         * Sets a custom {@link ClasspathLoader} to change the classpath of
+         * the subprocesses spawned by {@link MAC}.
+         *
+         * @param loader - The {@link ClasspathLoader} to use
+         * @return this
+         * @since 1.10.4
+         */
+        public MACConfigBuilder withClasspathLoader(ClasspathLoader loader) {
+            this.classpathLoader = loader;
             return this;
         }
 
+        /**
+         * Sets the base directory where configuration, logging and data goes.
+         * If the directory you specify has:
+         * <ul>
+         * <li><pre>conf/zoo.cfg</pre></li>conf/zoo.cfg
+         * <li><pre>conf/accumulo-site.xml</pre></li>
+         * </ul>
+         * The files in these directories will take precedent over anything
+         * set in {@link #withAccumuloSiteProperty(Property, String)} and
+         * {@link #withZookeeperProperty(String, String)}
+         *
+         * @param file - The base directory to use.
+         * @return this
+         * @since 1.10.4
+         */
         public MACConfigBuilder withBaseDirectory(File file) {
-            this.baseDir = file;
+            this.baseDirectory = file;
             return this;
         }
 
+        /**
+         * Each MAC gets its own ID for uniqueness’s sake. If you don't want
+         * that, you can specify an ID here. This will affect process IDs and
+         * the log file name (if you're using {@link #withFileLogging()}
+         *
+         * @param id - The MAC ID to use.
+         * @return this
+         * @since 1.10.4
+         */
         public MACConfigBuilder withId(String id) {
             this.macId = id;
             return this;
         }
 
+        /**
+         * By default, the logging for all subprocesses will be streamed to
+         * stdout/stderr. If you prefer to redirect these logs to files
+         * use this method. The logs will end up in {@link #baseDirectory}/logs
+         * and be named prefixed mac-{id}.
+         *
+         * @return this
+         * @since  1.10.4
+         */
         public MACConfigBuilder withFileLogging() {
             this.logToFile = true;
             return this;
         }
 
-        public MACConfigBuilder withZooKeeperStartupTimeoutMS(int timeout) {
-            this.zooKeeperStartupTimeout = timeout;
+        /**
+         * Sets the total time to wait for zookeeper up before giving up.
+         *
+         * @param msTimeout - Milliseconds to wait for zookeeper to respond imok
+         * @return this
+         * @since  1.10.4
+         */
+        public MACConfigBuilder withZooKeeperStartupTimeoutMS(int msTimeout) {
+            this.zooKeeperStartupTimeout = msTimeout;
             return this;
         }
 
+        /**
+         * Sets the zookeeper hostname accumulo should use. This is typically
+         * used when you have an external zookeeper you want to manage separate
+         * from MAC itself.
+         *
+         * @param hostname - The zookeeper hostname to use.
+         * @return this
+         * @since 1.10.4
+         */
         public MACConfigBuilder withZooKeeperHostname(String hostname) {
             this.zooKeeperHost = hostname;
             return this;
         }
 
+        /**
+         * By default, the zookeeper port will pick a random open port. If you
+         * want to use a static port, set it here.
+         *
+         * @param port - The port zookeeper should bind on.
+         * @return this
+         * @since 1.10.4
+         */
         public MACConfigBuilder withStaticZooKeeperPort(int port) {
             this.zooKeeperPort = port;
             return this;
         }
 
+        /**
+         * Sets the accumulo bind address. This is typically used when you
+         * want to run inside a container. In these cases, you'll likely want
+         * to set this to something like:
+         * <pre>
+         *     builder.withAccumuloBindAddress(InetAddress.getLocalHost().getHostAddress());
+         * </pre>
+         * This will use the current IP instead of the docker hostname.
+         *
+         * @param address - The hostname you would like the T-servers to
+         *                advertise themselves as
+         * @return this
+         * @since 1.10.4
+         */
         public MACConfigBuilder withAccumuloBindAddress(String address) {
             this.accumuloBindAddress = address;
             return this;
         }
 
+        /**
+         * Sets Java properties for the spawned zookeeper process.
+         * <p>
+         * If you want to change zookeeper configuration, you should likely be
+         * using {@link #withZookeeperProperty(String, String)} which affects
+         * the zoo.cfg file. This is useful for doing things like setting the
+         * max memory or other java settings.
+         * </p>
+         *
+         * @param key - A system property (without the -D)
+         * @param value - The value of the system property
+         * @return this
+         * @since 1.10.4
+         */
         public MACConfigBuilder withZookeeperJavaProperty(String key, String value) {
             zookeeperJvmProperties.put(key, value);
             return this;
         }
 
+        /**
+         * Sets Java properties for spawned Accumulo GC process.
+         * <p>
+         * If you want to change accumulo configuration, you should likely be
+         * using {@link #withAccumuloSiteProperty(Property, String)} which
+         * affects the accumulo-site.xml. This is useful for doing things like
+         * setting the max memory, or GC settings.
+         * </p>
+         * @param key - A system property (without the -D)
+         * @param value - The value of the system property
+         * @return this
+         * @since 1.10.4
+         */
         public MACConfigBuilder withAccumuloGCJavaProperty(String key, String value) {
             accumuloGCJvmProperties.put(key, value);
             return this;
         }
 
+        /**
+         * Sets Java properties for spawned Accumulo Manager process.
+         * <p>
+         * If you want to change accumulo configuration, you should likely be
+         * using {@link #withAccumuloSiteProperty(Property, String)} which
+         * affects the accumulo-site.xml. This is useful for doing things like
+         * setting the max memory, or GC settings.
+         * </p>
+         * @param key - A system property (without the -D)
+         * @param value - The value of the system property
+         * @return this
+         * @since 1.10.4
+         */
         public MACConfigBuilder withAccumuloManagerJavaProperty(String key, String value) {
             accumuloManagerJvmProperties.put(key, value);
             return this;
         }
 
+        /**
+         * Sets Java properties for spawned Accumulo T-Server process.
+         * <p>
+         * If you want to change accumulo configuration, you should likely be
+         * using {@link #withAccumuloSiteProperty(Property, String)} which
+         * affects the accumulo-site.xml. This is useful for doing things like
+         * setting the max memory, or GC settings.
+         * </p>
+         * @param key - A system property (without the -D)
+         * @param value - The value of the system property
+         * @return this
+         * @since 1.10.4
+         */
         public MACConfigBuilder withAccumuloTServerJavaProperty(String key, String value) {
             accumuloTserverJvmProperties.put(key, value);
             return this;
         }
 
+        /**
+         * Sets Java properties for spawned Accumulo Init process.
+         * <p>
+         * If you want to change accumulo configuration, you should likely be
+         * using {@link #withAccumuloSiteProperty(Property, String)} which
+         * affects the accumulo-site.xml. This is useful for doing things like
+         * setting the max memory, or GC settings.
+         * </p>
+         * @param key - A system property (without the -D)
+         * @param value - The value of the system property
+         * @return this
+         * @since 1.10.4
+         */
         public MACConfigBuilder withAccumuloInitJavaProperty(String key, String value) {
             accumuloInitJvmProperties.put(key, value);
             return this;
         }
 
+        /**
+         * Sets the number of tablet servers to spawn.
+         *
+         * @param num - The number of tablet servers to spawn.
+         * @return this
+         * @since 1.10.4
+         */
         public MACConfigBuilder withNumTservers(int num) {
             this.numTservers = num;
             return this;
         }
 
+        /**
+         * Modify the accumulo-site.xml with the associated properties.
+         * Note that if {@link #withBaseDirectory(File)} is used and a
+         * conf/accumulo-site.xml exists at that base directory, settings set
+         * here will be ignored.
+         *
+         * @param property - The property to set
+         * @param value - The value that property should be set to
+         * @return this
+         * @since 1.10.4
+         */
         public MACConfigBuilder withAccumuloSiteProperty(Property property, String value) {
             siteXml.put(property.getKey(), value);
             return this;
         }
 
+        /**
+         * Modify the zoo.cfg with the property passed in.
+         * Note that if {@link #withBaseDirectory(File)} is used and a
+         * conf/zoo.cfg exists at that base directory, settings set here will
+         * be ignored.
+         *
+         * @param key - The zoo.cfg property to set
+         * @param value - The value of the above property.
+         * @return this
+         * @since 1.10.4
+         */
         public MACConfigBuilder withZookeeperProperty(String key, String value) {
             zooCfg.put(key, value);
             return this;
         }
 
+        /**
+         * Sets Java properties for spawned all spawned processes.
+         *
+         * @param key - A system property (without the -D)
+         * @param value - The value of the system property
+         * @return this
+         * @since 1.10.4
+         */
         public MACConfigBuilder withGlobalJavaProperty(String key, String value) {
             withAccumuloGCJavaProperty(key, value);
             withAccumuloManagerJavaProperty(key, value);
@@ -361,20 +570,24 @@ public class MACConfig {
             return withZookeeperJavaProperty(key, value);
         }
 
+        /**
+         * Build the specified config.
+         * @since 1.10.4
+         */
         public MACConfig build() {
-            if (this.baseDir == null) {
-                this.baseDir = new File(System.getProperty("java.io.tmpdir"), "mac-" + this.macId);
+            if (this.baseDirectory == null) {
+                this.baseDirectory = new File(System.getProperty("java.io.tmpdir"), "mac-" + this.macId);
             }
 
-            File confDir = new File(this.baseDir, "conf");
-            File libDir = new File(this.baseDir, "lib");
+            File confDir = new File(this.baseDirectory, "conf");
+            File libDir = new File(this.baseDirectory, "lib");
             File libExtDir = new File(libDir, "ext");
 
             if (this.classpathLoader == null) {
                 this.classpathLoader = new DefaultClasspathLoader(Collections.singletonList(confDir.getAbsolutePath()));
             }
 
-            File accumuloData = new File(this.baseDir, "accumulo-data");
+            File accumuloData = new File(this.baseDirectory, "accumulo-data");
 
             setPropertyIfNotSet("instance.volumes", accumuloData.toURI().toString());
             setPropertyIfNotSet("general.classpaths", libDir.getAbsolutePath() + "/[^.].*[.]jar");
@@ -394,7 +607,7 @@ public class MACConfig {
                     this.macId,
                     this.logToFile,
                     this.zooKeeperStartupTimeout,
-                    baseDir,
+                    baseDirectory,
                     this.zooKeeperHost,
                     this.zooKeeperPort,
                     siteXml,
