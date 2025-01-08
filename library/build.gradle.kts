@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "com.loganasherjones"
-version = "1.0-SNAPSHOT"
+version = project.property("accumuloVersion").toString()
 
 repositories {
     mavenCentral()

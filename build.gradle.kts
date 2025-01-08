@@ -4,9 +4,6 @@ plugins {
     id("com.avast.gradle.docker-compose") version "0.17.12" apply false
 }
 
-group = "com.loganasherjones"
-version = "1.0-SNAPSHOT"
-
 repositories {
     mavenCentral()
 }
@@ -19,13 +16,10 @@ subprojects {
         // reload4j as runner.
         resolutionStrategy {
             force("org.slf4j:jcl-over-slf4j:1.7.36")
-//            force("org.slf4j:log4j-over-slf4j:1.7.36")
             force("org.slf4j:slf4j-api:1.7.36")
         }
-//        exclude("org.slf4j", "slf4j-reload4j")
         exclude("org.slf4j", "slf4j-log4j")
         exclude("org.slf4j", "slf4j-log4j12")
         exclude("log4j", "log4j")
-//        exclude("ch.qos.reload4j", "reload4j")
     }
 }

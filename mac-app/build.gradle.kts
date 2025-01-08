@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "com.loganasherjones"
-version = "1.0-SNAPSHOT"
+version = "${project.property("accumuloVersion")}-1"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
