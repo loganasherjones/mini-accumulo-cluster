@@ -50,7 +50,12 @@ public class MACProcess {
     }
 
     /**
+     * Forwards to {@link Process#waitFor()}
+     *
      * @see Process#waitFor()
+     * @return the return code of the process
+     * @throws InterruptedException when interrupted and the process is not dead
+     * @since 1.10.4
      */
     public int waitFor() throws InterruptedException {
         return process.waitFor();

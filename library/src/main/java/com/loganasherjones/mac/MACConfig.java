@@ -80,52 +80,132 @@ public class MACConfig {
         this.zooCfg = zooCfg;
     }
 
+    /**
+     * Returns the accumulo instance name.
+     *
+     * @return the accumulo instance name.
+     * @since 1.10.4
+     */
     public String getInstanceName() {
         return instanceName;
     }
 
+    /**
+     * Returns the original 'root' user's password.
+     *
+     * @return the original 'root' user's password.
+     * @since 1.10.4
+     */
     public String getRootPassword() {
         return rootPassword;
     }
 
+    /**
+     * Returns the specified {@link ClasspathLoader}
+     *
+     * @return the specified {@link ClasspathLoader}
+     * @since 1.10.4
+     */
     public ClasspathLoader getClasspathLoader() {
         return classpathLoader;
     }
 
+    /**
+     * Returns the unique ID for this MAC.
+     *
+     * @return the unique ID for this MAC.
+     * @since 1.10.4
+     */
     public String getMACId() {
         return this.id;
     }
 
-    public boolean logToFiles() {
+    /**
+     * Returns whether MAC will log to files.
+     *
+     * @return whether MAC will log to files.
+     * @since 1.10.4
+     */
+    public boolean shouldLogToFile() {
         return this.logToFile;
     }
 
+    /**
+     * Returns time to wait for zookeeper to start in milliseconds.
+     *
+     * @return time to wait for zookeeper to start in milliseconds.
+     * @since 1.10.4
+     */
     public int getZooKeeperStartupTimeout() {
         return this.zooKeeperStartupTimeout;
     }
 
+    /**
+     * Returns the location of the zoo.cfg file.
+     *
+     * @return the location of the zoo.cfg file.
+     * @since 1.10.4
+     */
     public File getZooCfgFile() {
         return new File(this.configDirectory, "zoo.cfg");
     }
 
+    /**
+     * Returns the log directory where log files should be stored.
+     *
+     * @return the log directory where log files should be stored.
+     * @since 1.10.4
+     */
     public File getLogDir() {
         return this.logDirectory;
     }
 
+    /**
+     * Returns the zookeeper host accumulo should connect to.
+     *
+     * @return the zookeeper host accumulo should connect to.
+     * @since 1.10.4
+     */
     public String getZooKeeperHost() {
         return this.zooKeeperHost;
     }
 
+    /**
+     * Returns the bind address for accumulo.
+     *
+     * @return the bind address for accumulo.
+     * @since 1.10.4
+     */
     public String getAccumuloBindAddress() {
         return this.accumuloBindAddress;
     }
 
+    /**
+     * Returns the key/value pairs to use for accumulo-site.xml
+     *
+     * @return the key/value pairs to use for accumulo-site.xml
+     * @since 1.10.4
+     */
     public Map<String, String> getSiteConfig() {
         return this.siteConfig;
     }
 
+    /**
+     * Returns the base directory where configuration/logging goes.
+     *
+     * @return the base directory where configuration/logging goes.
+     * @since 1.10.4
+     */
     public File getBaseDirectory() { return this.baseDirectory; }
 
+    /**
+     * Returns the actual bound zookeeper port. If -1 was provided, then a
+     * random port will be selected. So once this function has been called once
+     * the zookeeperPort will be updated to the selected port.
+     *
+     * @return the actual bound zookeeper port.
+     * @since 1.10.4
+     */
     public int getZooKeeperPort() {
         if (this.zooKeeperPort != -1) {
             return this.zooKeeperPort;
@@ -141,10 +221,22 @@ public class MACConfig {
         return this.zooKeeperPort;
     }
 
+    /**
+     * Returns the JVM system properties to use for the zookeeper process.
+     *
+     * @return the JVM system properties to use for the zookeeper process.
+     * @since 1.10.4
+     */
     public Map<String, String> getZooKeeperJvmProperties() {
         return jvmProperties.get("zookeeper");
     }
 
+    /**
+     * Returns the JVM system properties to use for the accumulo GC process.
+     *
+     * @return the JVM system properties to use for the accumulo GC process.
+     * @since 1.10.4
+     */
     public Map<String, String> getAccumuloGCJvmProperties() {
         return jvmProperties.get("gc");
     }
@@ -208,18 +300,42 @@ public class MACConfig {
         return !(zooKeeperHost.equals("localhost") || zooKeeperHost.equals("127.0.0.1"));
     }
 
+    /**
+     * Returns the JVM system properties for the accumulo manager process.
+     *
+     * @return the JVM system properties for the accumulo manager process.
+     * @since 1.10.4
+     */
     public Map<String, String> getAccumuloManagerJvmProperties() {
         return jvmProperties.get("manager");
     }
 
+    /**
+     * Returns the JVM system properties for the accumulo T-server process.
+     *
+     * @return the JVM system properties for the accumulo T-server process.
+     * @since 1.10.4
+     */
     public Map<String, String> getAccumuloTserverJvmProperties() {
         return jvmProperties.get("tserver");
     }
 
+    /**
+     * Returns the number of T-servers to spawn.
+     *
+     * @return the number of T-servers to spawn.
+     * @since 1.10.4
+     */
     public int getNumTservers() {
         return numTservers;
     }
 
+    /**
+     * Returns the JVM system properties for the accumulo init process.
+     *
+     * @return the JVM system properties for the accumulo init process.
+     * @since 1.10.4
+     */
     public Map<String, String> getAccumuloInitJvmProperties() {
         return jvmProperties.get("init");
     }
@@ -234,6 +350,11 @@ public class MACConfig {
      * @since 1.10.4
      */
     public static class MACConfigBuilder {
+
+        /**
+         * Create an instance with "sensible" defaults for integration testing.
+         */
+        public MACConfigBuilder() {}
 
         private String macId = UUID.randomUUID().toString();
         private String instanceName = "default";
@@ -317,7 +438,7 @@ public class MACConfig {
          * Sets the base directory where configuration, logging and data goes.
          * If the directory you specify has:
          * <ul>
-         * <li><pre>conf/zoo.cfg</pre></li>conf/zoo.cfg
+         * <li><pre>conf/zoo.cfg</pre></li>
          * <li><pre>conf/accumulo-site.xml</pre></li>
          * </ul>
          * The files in these directories will take precedent over anything
@@ -572,6 +693,8 @@ public class MACConfig {
 
         /**
          * Build the specified config.
+         *
+         * @return a {@link MACConfig} used to initialize {@link MAC}
          * @since 1.10.4
          */
         public MACConfig build() {

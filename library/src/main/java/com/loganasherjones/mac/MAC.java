@@ -39,7 +39,7 @@ import java.util.Map;
  *     The simplest possible usage is:
  * </p>
  *
- * <pre>
+ * <pre>{@code
  * @Test
  * public void myTest() {
  *     // Create mac with default configuration.
@@ -50,7 +50,7 @@ import java.util.Map;
  *     // Do whatever with the rootConnector
  *     mac.stop();
  * }
- * </pre>
+ * }</pre>
  *
  * There are many configuration options. See the {@link MACConfig.MACConfigBuilder}
  *
@@ -82,7 +82,7 @@ public class MAC {
      */
     public MAC(MACConfig config) {
         this.config = config;
-        this.spawner = new MACProcessSpawner(config.getClasspathLoader(), config.logToFiles(), config.getLogDir());
+        this.spawner = new MACProcessSpawner(config.getClasspathLoader(), config.shouldLogToFile(), config.getLogDir());
     }
 
     /**
@@ -107,7 +107,11 @@ public class MAC {
      * Get an {@link Connector} for the specified user/password.
      *
      * @see ZooKeeperInstance#getConnector(String, AuthenticationToken)
-     * @since 1.10.4
+     * @param user - Accumulo username
+     * @param token - Accumulo username's password
+     * @return an Accumulo Connector
+     * @throws AccumuloException if something unexpected goes wrong.
+     * @throws AccumuloSecurityException If there is an auth problem.
      */
     public Connector getConnector(String user, AuthenticationToken token) throws AccumuloException, AccumuloSecurityException {
         Instance instance = new ZooKeeperInstance(getClientConfig());
