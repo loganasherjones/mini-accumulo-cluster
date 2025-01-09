@@ -22,3 +22,10 @@ services:
       ZOO_4LW_COMMANDS_WHITELIST: "srvr,ruok"
     ports:
       - "2181:2181"
+
+  zookeeperHostNetworking:
+    image: "zookeeper:3.7.2"
+    environment:
+      ZOO_4LW_COMMANDS_WHITELIST: "srvr,ruok"
+    ports:
+      - "2183:2181"

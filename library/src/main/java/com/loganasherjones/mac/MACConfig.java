@@ -32,6 +32,7 @@ public class MACConfig {
     private final File logDirectory;
     private final String zooKeeperHost;
     private int zooKeeperPort;
+    private final Boolean forceExternalZookeeper;
     private final Map<String, String> siteConfig;
     private final String accumuloBindAddress;
     private final Map<String, Map<String, String>> jvmProperties = new HashMap<>();
@@ -56,7 +57,8 @@ public class MACConfig {
             Map<String, String> accumuloTserverJvmProperties,
             Map<String, String> accumuloInitJvmProperties,
             int numTservers,
-            Map<String, String> zooCfg
+            Map<String, String> zooCfg,
+            Boolean forceExternalZookeeper
     ) {
         this.instanceName = instanceName;
         this.rootPassword = rootPassword;
@@ -78,6 +80,7 @@ public class MACConfig {
         this.jvmProperties.put("init", accumuloInitJvmProperties);
         this.numTservers = numTservers;
         this.zooCfg = zooCfg;
+        this.forceExternalZookeeper = forceExternalZookeeper;
     }
 
     /**
@@ -297,7 +300,11 @@ public class MACConfig {
     }
 
     public boolean useExistingZookeeper() {
-        return !(zooKeeperHost.equals("localhost") || zooKeeperHost.equals("127.0.0.1"));
+        if (forceExternalZookeeper == null) {
+            return !(zooKeeperHost.equals("localhost") || zooKeeperHost.equals("127.0.0.1"));
+        } else {
+            return forceExternalZookeeper;
+        }
     }
 
     /**
@@ -364,6 +371,7 @@ public class MACConfig {
         private boolean logToFile = false;
         private String zooKeeperHost = "127.0.0.1";
         private int zooKeeperPort = -1;
+        private Boolean useExternalZookeeper = null;
         private int zooKeeperStartupTimeout = 10000;
         private String accumuloBindAddress = null;
         private final Map<String, String> accumuloGCJvmProperties = new HashMap<>();
@@ -518,6 +526,33 @@ public class MACConfig {
          */
         public MACConfigBuilder withStaticZooKeeperPort(int port) {
             this.zooKeeperPort = port;
+            return this;
+        }
+
+        /**
+         * Indicates if an external zookeeper is true or false.
+         * <p>
+         * Typically, you won't need to use this call. This is really only
+         * useful in the following scenarios:
+         * </p>
+         * <ul>
+         *     <li>You have an external zookeeper running on localhost or
+         *     127.0.0.1</li>
+         *     <li>You want the zookeeper spawned by MAC to run on a specific
+         *     IP that is not 127.0.0.1</li>
+         * </ul>
+         * <p>
+         *     By default, MAC will assume if the {@link #zooKeeperHost} is
+         *     either localhost or 127.0.0.1, then you want MAC to spawn a
+         *     zookeeper.
+         * </p>
+         *
+         * @return this
+         * @param useExternal - indicates if an external zookeeper is used.
+         * @since 1.10.4
+         */
+        public MACConfigBuilder withUseExternalZookeeper(boolean useExternal) {
+            this.useExternalZookeeper = useExternal;
             return this;
         }
 
@@ -741,7 +776,8 @@ public class MACConfig {
                     accumuloTserverJvmProperties,
                     accumuloInitJvmProperties,
                     numTservers,
-                    zooCfg
+                    zooCfg,
+                    useExternalZookeeper
             );
         }
 
