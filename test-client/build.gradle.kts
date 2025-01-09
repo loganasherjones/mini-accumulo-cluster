@@ -15,6 +15,7 @@ java {
 
 dependencies {
     implementation("org.apache.accumulo:accumulo-core:${project.property("accumuloVersion")}")
+    implementation("org.apache.zookeeper:zookeeper:3.7.2")
     implementation(platform("org.junit:junit-bom:5.10.0"))
     implementation("org.junit.jupiter:junit-jupiter")
     implementation("ch.qos.reload4j:reload4j:1.2.22")
