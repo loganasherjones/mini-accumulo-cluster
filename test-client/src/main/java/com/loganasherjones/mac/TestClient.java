@@ -32,12 +32,17 @@ public class TestClient {
     private final ColumnVisibility aAndB = new ColumnVisibility("A&B");
     private final Connector rootConnector;
     private final Instance instance;
+    private final boolean skipIteratorTest;
 
     public TestClient(Instance instance, Connector rootConnector) {
-        this.instance = instance;
-        this.rootConnector = rootConnector;
+        this(instance, rootConnector, false);
     }
 
+    public TestClient(Instance instance, Connector rootConnector, boolean skipIteratorTest) {
+        this.instance = instance;
+        this.rootConnector = rootConnector;
+        this.skipIteratorTest = skipIteratorTest;
+    }
 
     public void runTest() throws Exception {
         cleanup();
@@ -143,10 +148,12 @@ public class TestClient {
         scanner.close();
 
         // Iterator Testing
-        try {
-            customIteratorScan(conn);
-        } catch (Exception e) {
-            fail("Error occurred during iterator-base scanning: " + e.getMessage());
+        if (!skipIteratorTest) {
+            try {
+                customIteratorScan(conn);
+            } catch (Exception e) {
+                fail("Error occurred during iterator-base scanning: " + e.getMessage());
+            }
         }
     }
 
