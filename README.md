@@ -30,7 +30,7 @@ To use this project, first install it:
 **Gradle**
 
 ```
-implementation 'com.loganasherjones:mini-accumulo-cluster:1.10.4
+implementation 'com.loganasherjones:mini-accumulo-cluster:1.10.4'
 ```
 
 Coming soon...
