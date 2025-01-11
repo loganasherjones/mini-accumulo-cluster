@@ -7,6 +7,7 @@ import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.Instance;
 import org.apache.accumulo.core.client.ZooKeeperInstance;
 import org.apache.accumulo.core.client.security.tokens.AuthenticationToken;
+import org.apache.accumulo.core.client.security.tokens.PasswordToken;
 import org.apache.accumulo.core.master.thrift.MasterGoalState;
 import org.apache.accumulo.gc.SimpleGarbageCollector;
 import org.apache.accumulo.master.Master;
@@ -116,6 +117,20 @@ public class MAC {
     public Connector getConnector(String user, AuthenticationToken token) throws AccumuloException, AccumuloSecurityException {
         Instance instance = new ZooKeeperInstance(getClientConfig());
         return instance.getConnector(user, token);
+    }
+
+    /**
+     * Get an {@link Connector} for the 'root' user.
+     * <p>
+     * Note that if you change root's password, after starting
+     * this function will not work correctly.
+     * </p>
+     * @return A root connector
+     * @throws AccumuloException if something unexpected goes wrong.
+     * @throws AccumuloSecurityException If there is an auth problem.
+     */
+    public Connector getRootConnector() throws AccumuloException, AccumuloSecurityException {
+        return getConnector("root", config.getRootPassword());
     }
 
     private ClientConfiguration getClientConfig() {
