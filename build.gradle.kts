@@ -9,8 +9,11 @@ repositories {
     mavenCentral()
 }
 
+version = "1.10.4-1.SNAPSHOT"
+
 mkdocs {
-    sourcesDir = "docs"
+    sourcesDir = "."
+    extras = mapOf("project_version" to project.version.toString())
 }
 
 subprojects {
