@@ -49,7 +49,11 @@ public class Main {
 
     private static MACConfig generateConfig() throws UnknownHostException {
         MACConfig.MACConfigBuilder builder = new MACConfig.MACConfigBuilder();
-        if (isInContainer()) {
+
+        String bindAddress = System.getenv("MAC_ACCUMULO_BIND_ADDRESS");
+        if (bindAddress != null && !bindAddress.isEmpty()) {
+            builder.withAccumuloBindAddress(bindAddress);
+        } else if (isInContainer()) {
             builder.withAccumuloBindAddress(InetAddress.getLocalHost().getHostAddress());
         }
 
@@ -75,6 +79,31 @@ public class Main {
         String fileLogging = System.getenv("MAC_FILE_LOGGING");
         if (fileLogging != null && fileLogging.equalsIgnoreCase("true")) {
             builder.withFileLogging();
+        }
+
+        String rootPassword = System.getenv("MAC_ROOT_PASSWORD");
+        if (rootPassword != null && !rootPassword.isEmpty()) {
+            builder.withRootPassword(rootPassword);
+        }
+
+        String instanceName = System.getenv("MAC_INSTANCE_NAME");
+        if (instanceName != null && !instanceName.isEmpty()) {
+            builder.withInstanceName(instanceName);
+        }
+
+        String numTserversStr = System.getenv("MAC_NUM_TSERVERS");
+        if (numTserversStr != null && !numTserversStr.isEmpty()) {
+            builder.withNumTservers(Integer.parseInt(numTserversStr));
+        }
+
+        String useExternalStr = System.getenv("MAC_USE_EXTERNAL_ZOOKEEPER");
+        if (useExternalStr != null && !useExternalStr.isEmpty()) {
+            builder.withUseExternalZookeeper(useExternalStr.equalsIgnoreCase("true"));
+        }
+
+        String zookeeperStartupTimeout = System.getenv("MAC_ZOOKEEPER_STARTUP_TIMEOUT_MS");
+        if (zookeeperStartupTimeout != null && !zookeeperStartupTimeout.isEmpty()) {
+            builder.withZooKeeperStartupTimeoutMS(Integer.parseInt(zookeeperStartupTimeout));
         }
 
         return builder
