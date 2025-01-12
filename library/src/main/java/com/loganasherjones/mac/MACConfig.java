@@ -299,6 +299,12 @@ public class MACConfig {
                 .replace(">", "&gt;");
     }
 
+    /**
+     * Determine if an external zookeeper should be used by MAC or not.
+     *
+     * @return true if an external zookeeper should be used, false otherwise.
+     * @since 1.10.4
+     */
     public boolean useExistingZookeeper() {
         if (forceExternalZookeeper == null) {
             return !(zooKeeperHost.equals("localhost") || zooKeeperHost.equals("127.0.0.1"));
