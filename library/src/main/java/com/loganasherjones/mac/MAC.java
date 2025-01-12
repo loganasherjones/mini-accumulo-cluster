@@ -130,7 +130,7 @@ public class MAC {
      * @throws AccumuloSecurityException If there is an auth problem.
      */
     public Connector getRootConnector() throws AccumuloException, AccumuloSecurityException {
-        return getConnector("root", config.getRootPassword());
+        return getConnector("root", new PasswordToken(config.getRootPassword()));
     }
 
     private ClientConfiguration getClientConfig() {
