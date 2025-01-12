@@ -9,7 +9,7 @@ repositories {
     mavenCentral()
 }
 
-version = "1.10.4-1.SNAPSHOT"
+version = "1.10.4-1"
 
 mkdocs {
     sourcesDir = "."
