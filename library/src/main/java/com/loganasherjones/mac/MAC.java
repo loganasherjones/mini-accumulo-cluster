@@ -12,7 +12,6 @@ import org.apache.accumulo.core.master.thrift.MasterGoalState;
 import org.apache.accumulo.gc.SimpleGarbageCollector;
 import org.apache.accumulo.master.Master;
 import org.apache.accumulo.master.state.SetGoalState;
-import org.apache.accumulo.minicluster.impl.ZooKeeperBindException;
 import org.apache.accumulo.server.init.Initialize;
 import org.apache.accumulo.shell.Shell;
 import org.apache.accumulo.tserver.TabletServer;
@@ -345,7 +344,7 @@ public class MAC {
                 log.debug("Zookeeper is not ok.");
                 log.trace("Error message was: ", e);
                 if (System.currentTimeMillis() - startTime >= config.getZooKeeperStartupTimeout()) {
-                    throw new ZooKeeperBindException("Zookeeper did not start within "
+                    throw new RuntimeException("Zookeeper did not start within "
                             + (config.getZooKeeperStartupTimeout() / 1000) + " seconds. Check the logs in "
                             + config.getLogDir() + " for errors.  Last exception: " + e);
                 }

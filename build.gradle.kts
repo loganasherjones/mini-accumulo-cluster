@@ -3,6 +3,7 @@ plugins {
     id("com.bmuschko.docker-remote-api") version "9.4.0" apply false
     id("com.avast.gradle.docker-compose") version "0.17.12" apply false
     id("ru.vyarus.mkdocs") version "4.0.1"
+    id("ca.cutterslade.analyze") version "1.10.0"
 }
 
 repositories {
