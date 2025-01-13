@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.loganasherjones"
-version = project.property("accumuloVersion").toString()
+version = rootProject.version
 
 repositories {
     mavenCentral()

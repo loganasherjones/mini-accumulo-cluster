@@ -9,11 +9,12 @@ repositories {
     mavenCentral()
 }
 
-version = "1.10.4-1"
+val accumuloVersion = project.property("accumuloVersion").toString()
+version = "${accumuloVersion}-1"
 
 mkdocs {
     sourcesDir = "."
-    extras = mapOf("project_version" to project.version.toString())
+    extras = mapOf("project_version" to version.toString())
 }
 
 subprojects {
