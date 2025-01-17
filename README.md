@@ -16,7 +16,7 @@ the future.
 
 ## TODOs:
 
-- [ ] Publish library
+- [x] Publish library
 - [ ] Publish Docker Image
 - [ ] Publish Versioned Documentation
 - [ ] Auto Schema Creation
@@ -30,3 +30,25 @@ See [Java Documentation](./docs/java/index.md)
 ## Docker Usage
 
 See [Docker Documentation](./docs/docker/index.md)
+
+## Releasing
+
+Setting up gradle to push thing to maven central was a major pain. I'm
+documenting what I learned here briefly.
+
+1. [Generate GPG Keys](https://docs.github.com/en/authentication/managing-commit-signature-verification/adding-a-gpg-key-to-your-github-account)
+2. Have the following `~/.gradle/gradle.properties`:
+   ```
+   mavenCentralUsername=<username>
+   mavenCentralPassword=<password>
+
+   signing.keyId=<keyId>
+   signing.password=<password>
+   signing.secretKeyRingFile=/Users/yourusername/.gnupg/secring.gpg
+   ```
+   * Where `<username>`/`<password>` are created via the [client portal](https://central.sonatype.com/)
+     by logging in, going to the top right, selecting "View account", then
+     "Generate User Token"
+3. Run `./gradlew library:publishToMavenCentral`
+4. Verify the release in the Client Portal -> `Publish`
+5. Find your deployment and click "Publish"
