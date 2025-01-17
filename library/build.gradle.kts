@@ -64,8 +64,10 @@ mavenPublishing {
         url = "https://github.com/loganasherjones/mini-accumulo-cluster"
 
         licenses {
-            name = "MIT"
-            url = "https://opensource.org/license/MIT"
+            license {
+                name = "MIT"
+                url = "https://opensource.org/license/MIT"
+            }
         }
 
         developers {
