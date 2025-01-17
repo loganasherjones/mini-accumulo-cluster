@@ -33,8 +33,31 @@ See [Docker Documentation](./docs/docker/index.md)
 
 ## Releasing
 
+1. Modify `build.gradle.kts` and remove the `SNAPSHOT` from the version.
+2. Commit the changes
+3. Publish the Java Library:
+   ```bash
+   ./gradlew library:publishToMavenCentral 
+   ```
+4. Release the Java Library by going to the [Client Portal](https://central.sonatype.com/publishing)
+   and clicking `Publish` on the deployment you just created.
+5. Release the Docker App:
+   ```bash
+   ./gradlew mac-app:buildImageTask
+   docker push loganasherjones/mini-accumulo-cluster:INSERT_YOUR_VERSION
+   ```
+6. Tag in git:
+   ```bash
+   git tag ${VERSION}
+   git push --tags
+   ```
+7. Update the version in `build.gradle.kts` and commit
+
+### Deploy the Java Library
+
 Setting up gradle to push thing to maven central was a major pain. I'm
-documenting what I learned here briefly.
+documenting what I learned here briefly. The releasing process for this
+repo is broken down to three steps:
 
 1. [Generate GPG Keys](https://docs.github.com/en/authentication/managing-commit-signature-verification/adding-a-gpg-key-to-your-github-account)
 2. Have the following `~/.gradle/gradle.properties`:
