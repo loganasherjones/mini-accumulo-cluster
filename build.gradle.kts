@@ -4,6 +4,7 @@ plugins {
     id("com.avast.gradle.docker-compose") version "0.17.12" apply false
     id("ru.vyarus.mkdocs") version "4.0.1"
     id("ca.cutterslade.analyze") version "1.10.0"
+    id("com.vanniktech.maven.publish") version "0.30.0"
 }
 
 repositories {
@@ -11,7 +12,7 @@ repositories {
 }
 
 val accumuloVersion = project.property("accumuloVersion").toString()
-version = "${accumuloVersion}-1"
+version = "${accumuloVersion}-0-SNAPSHOT"
 
 mkdocs {
     sourcesDir = "."

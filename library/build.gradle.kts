@@ -1,7 +1,11 @@
+import com.vanniktech.maven.publish.JavaLibrary
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SonatypeHost
+
 plugins {
     id("java")
-    id("maven-publish")
     id("ca.cutterslade.analyze")
+    id("com.vanniktech.maven.publish")
 }
 
 group = "com.loganasherjones"
@@ -14,8 +18,6 @@ repositories {
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
-    withJavadocJar()
-    withSourcesJar()
 }
 
 val accumuloVersion = project.property("accumuloVersion").toString()
@@ -43,11 +45,48 @@ tasks.test {
     useJUnitPlatform()
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            artifactId = "mini-accumulo-cluster"
-            from(components["java"])
+val isReleaseVersion = !rootProject.version.toString().endsWith("SNAPSHOT")
+
+mavenPublishing {
+    configure(JavaLibrary(
+        javadocJar = JavadocJar.Javadoc(),
+        sourcesJar = true
+    ))
+    coordinates(
+        groupId = group as String,
+        artifactId = "mini-accumulo-cluster",
+        version = rootProject.version as String,
+    )
+
+    pom {
+        name = "mini-accumulo-cluster"
+        description = "A mini accumulo cluster for integration testing"
+        url = "https://github.com/loganasherjones/mini-accumulo-cluster"
+
+        licenses {
+            name = "MIT"
+            url = "https://opensource.org/license/MIT"
         }
+
+        developers {
+            developer {
+                id = "loganasherjones"
+                name = "Logan Asher Jones"
+                email = "loganasherjones@gmail.com"
+                organizationUrl = "https://github.com/loganasherjones"
+            }
+        }
+
+        scm {
+            connection = "scm:git:git://github.com/loganasherjones/mini-accumulo-cluster.git"
+            developerConnection = "scm:git:ssh://github.com/loganasherjones/mini-accumulo-cluster.git"
+            url = "https://github.com/loganasherjones/mini-accumulo-cluster"
+        }
+
+        publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+
+    }
+    if (isReleaseVersion) {
+        signAllPublications()
     }
 }
