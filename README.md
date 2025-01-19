@@ -43,12 +43,16 @@ See [Docker Documentation](./docs/docker/index.md)
    ./gradlew mac-app:buildImageTask
    docker push loganasherjones/mini-accumulo-cluster:INSERT_YOUR_VERSION
    ```
-6. Tag in git:
+6. Release the documentation:
+   ```bash
+   ./gradlew mkdocsPublish
+   ```
+7. Tag in git:
    ```bash
    git tag ${VERSION}
    git push --tags
    ```
-7. Update the version in `build.gradle.kts` and commit
+8. Update the version in `build.gradle.kts` and commit
 
 ### Deploy the Java Library
 
