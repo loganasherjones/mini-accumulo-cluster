@@ -17,10 +17,7 @@ version = "${accumuloVersion}-0"
 mkdocs {
     sourcesDir = "."
     extras = mapOf("project_version" to version.toString())
-}
-
-gitPublish {
-    repoUri = "git@github.com:loganasherjones/mini-accumulo-cluster"
+    publish.repoUri = "git@github.com:loganasherjones/mini-accumulo-cluster"
 }
 
 subprojects {
