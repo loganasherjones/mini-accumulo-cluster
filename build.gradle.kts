@@ -19,6 +19,10 @@ mkdocs {
     extras = mapOf("project_version" to version.toString())
 }
 
+gitPublish {
+    repoUri = "git@github.com:loganasherjones/mini-accumulo-cluster"
+}
+
 subprojects {
     configurations.all {
         // Accumulo uses reload4j for its logging. I'd like to use logback, but
