@@ -12,16 +12,12 @@ repositories {
 }
 
 val accumuloVersion = project.property("accumuloVersion").toString()
-version = "${accumuloVersion}"
+version = "${accumuloVersion}-0"
 
 mkdocs {
     sourcesDir = "."
     extras = mapOf("project_version" to version.toString())
     publish.repoUri = "git@github.com:loganasherjones/mini-accumulo-cluster"
-}
-
-gitPublish {
-    repoUri = "git@github.com:loganasherjones/mini-accumulo-cluster"
 }
 
 subprojects {
