@@ -1,3 +1,7 @@
+---
+hide:
+- navigation
+---
 # Java Mini Accumulo Cluster
 
 This section will go over how to use the Mini Accumulo Cluster from Java code.

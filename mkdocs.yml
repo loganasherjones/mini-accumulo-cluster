@@ -1,99 +1,66 @@
 site_name: Mini Accumulo Cluster
 
-# Meta tags (placed in header)
 site_description: Mini Accumulo Cluster Documentation
 site_author: Logan Asher Jones
 site_url: https://loganasherjones.github.io/mini-accumulo-cluster
 
-# Repository (add link to repository on each page)
 repo_name: mini-accumulo-cluster
 repo_url: https://github.com/loganasherjones/mini-accumulo-cluster
-edit_uri: edit/main/docs/docs/
+edit_uri: edit/main/docs/
 
-#Copyright (shown at the footer)
-#copyright: 'Copyright &copy; 2017 Your Name'
+copyright: 'Copyright &copy; 2025 Logan Asher Jones'
 
-# Meterial theme
 theme:
   name: 'material'
   palette:
     - media: "(prefers-color-scheme: light)"
-      scheme: default
+      scheme: custom-light
       toggle:
         icon: material/toggle-switch-off-outline
         name: Switch to dark mode
     - media: "(prefers-color-scheme: dark)"
-      scheme: slate
+      scheme: custom-dark
       toggle:
         icon: material/toggle-switch
         name: Switch to light mode
   features:
     - content.code.copy
-    #- navigation.tabs
-    #- navigation.tabs.sticky
-    #- navigation.instant
-    - navigation.tracking
-    - navigation.top
+    - navigation.tabs
+    - navigation.indexes
+    - navigation.instant
+
+# Custom colors.
+extra_css:
+  - stylesheets/extra.css
 
 plugins:
-#  - search
-#    Required for variables support (https://github.com/rosscdh/mkdocs-markdownextradata-plugin)
+  - search
+  # Required to get version numbers working correctly.
   - markdownextradata
 
-extra:
-  foo: "BLAH"
-#  palette:
-#    primary: 'indigo'
-#    accent: 'indigo'
-
-#  version:
-#    provider: mike
-
-#  social:
-#    - icon: fontawesome/brands/github
-#      link: https://github.com/you
-#    - icon: fontawesome/brands/twitter
-#      link: https://twitter.com/you
-#
-# Google Analytics
-#  analytics:
-#    provider: google
-#    property: UA-XXXXXXXX-X
 
 markdown_extensions:
-  # Python Markdown
-  - abbr
-  - admonition
+  # Core requirement for other things.
   - attr_list
-  - def_list
-  - footnotes
-  - meta
-  - md_in_html
-  - toc:
-      permalink: true
 
-  # Python Markdown Extensions
-  - pymdownx.arithmatex:
-      generic: true
-  - pymdownx.betterem:
-      smart_enable: all
-  - pymdownx.caret
-  - pymdownx.details
+  # Icons
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
-  - pymdownx.highlight
+
+  # Syntax Highlighting
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
   - pymdownx.inlinehilite
-  - pymdownx.keys
-  - pymdownx.mark
-  - pymdownx.smartsymbols
+  - pymdownx.snippets
   - pymdownx.superfences
+
+  # Content Tabs
   - pymdownx.tabbed:
       alternate_style: true
-  - pymdownx.tasklist:
-      custom_checkbox: true
-  - pymdownx.tilde
 
-nav:
-  - Home: index.md
-  - Java: java/index.md
+extra:
+  version:
+    provider: mike

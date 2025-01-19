@@ -1,4 +1,9 @@
-# Mini Accumulo Cluster Documentation
+---
+hide:
+- navigation
+- toc
+---
+# Home
 
 Welcome to the documentation for the unofficial Mini Accumulo Cluster.
 Accumulo comes with a builtin Mini Accumulo Cluster, but it is hard

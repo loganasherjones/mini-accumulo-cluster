@@ -1,3 +1,7 @@
+---
+hide:
+  - navigation
+---
 # Docker Mini Accumulo Cluster
 
 This section will go over how to use the Mini Accumulo Cluster with Docker.
