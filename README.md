@@ -16,9 +16,6 @@ the future.
 
 ## TODOs:
 
-- [x] Publish library
-- [ ] Publish Docker Image
-- [ ] Publish Versioned Documentation
 - [ ] Auto Schema Creation
 - [ ] Create 2.X Version
 - [ ] Create 3.X Version
