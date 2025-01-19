@@ -14,19 +14,12 @@ testing.
 At the moment, only 1.10.X is supported with the intent of supporting 2.X in
 the future.
 
-## TODOs:
+See [Project Documentation](https://loganasherjones.github.io/mini-accumulo-cluster/)
+for full details on usage.
 
-- [ ] Auto Schema Creation
+## TODOS:
+
 - [ ] Create 2.X Version
-- [ ] Create 3.X Version
-
-## Java Usage
-
-See [Java Documentation](./docs/java/index.md)
-
-## Docker Usage
-
-See [Docker Documentation](./docs/docker/index.md)
 
 ## Releasing
 
