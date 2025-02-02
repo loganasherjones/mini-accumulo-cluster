@@ -8,9 +8,9 @@ import org.apache.accumulo.core.client.Instance;
 import org.apache.accumulo.core.client.ZooKeeperInstance;
 import org.apache.accumulo.core.client.security.tokens.AuthenticationToken;
 import org.apache.accumulo.core.client.security.tokens.PasswordToken;
-import org.apache.accumulo.core.master.thrift.MasterGoalState;
+import org.apache.accumulo.core.manager.thrift.ManagerGoalState;
 import org.apache.accumulo.gc.SimpleGarbageCollector;
-import org.apache.accumulo.master.Master;
+import org.apache.accumulo.manager.Manager;
 import org.apache.accumulo.master.state.SetGoalState;
 import org.apache.accumulo.server.init.Initialize;
 import org.apache.accumulo.shell.Shell;
@@ -154,6 +154,9 @@ public class MAC {
             if (!initialized) {
                 log.info("Starting Mini Accumulo Cluster");
                 config.createDirectoryStructure();
+                if (config.shouldLogToFile()) {
+                    log.info("You can find logs at: {}", config.getLogDir());
+                }
 
                 ensureStopIsCalled();
                 ensureZookeeperIsRunning();
@@ -232,7 +235,7 @@ public class MAC {
         String processName = "mac-" + config.getMACId() + "-manager";
         MACProcess process = spawner.spawnProcess(
                 processName,
-                Master.class.getName(),
+                Manager.class.getName(),
                 getAccumuloAddressArgs(),
                 config.getAccumuloManagerJvmProperties()
         );
@@ -244,7 +247,7 @@ public class MAC {
         MACProcess process = spawner.spawnProcess(
                 processName,
                 SetGoalState.class.getName(),
-                Collections.singletonList(MasterGoalState.NORMAL.toString()),
+                Collections.singletonList(ManagerGoalState.NORMAL.toString()),
                 config.getAccumuloInitJvmProperties()
         );
         int retCode = process.waitFor();
