@@ -1,9 +1,5 @@
 package com.loganasherjones.mac;
 
-import org.apache.accumulo.core.client.Connector;
-import org.apache.accumulo.core.client.Instance;
-import org.apache.accumulo.core.client.ZooKeeperInstance;
-import org.apache.accumulo.core.client.security.tokens.PasswordToken;
 import org.junit.jupiter.api.Test;
 
 public class MACTest {
@@ -13,9 +9,13 @@ public class MACTest {
         MAC cluster = new MAC(config);
         try {
             cluster.start();
-            Instance instance = new ZooKeeperInstance(cluster.getInstanceName(), cluster.getZooKeepers());
-            Connector connector = cluster.getConnector("root", new PasswordToken(config.getRootPassword()));
-            TestClient client = new TestClient(instance, connector);
+            TestClient client = new TestClient(
+                    cluster.getInstanceName(),
+                    config.getZooKeeperHost(),
+                    config.getZooKeeperPort(),
+                    config.getRootPassword(),
+                    false
+            );
             client.runTest();
         } finally {
             cluster.stop();

@@ -1,5 +1,7 @@
 package com.loganasherjones.mac;
 
+import org.apache.accumulo.core.client.Accumulo;
+import org.apache.accumulo.core.client.AccumuloClient;
 import org.apache.accumulo.core.client.AccumuloException;
 import org.apache.accumulo.core.client.AccumuloSecurityException;
 import org.apache.accumulo.core.client.ClientConfiguration;
@@ -11,7 +13,7 @@ import org.apache.accumulo.core.client.security.tokens.PasswordToken;
 import org.apache.accumulo.core.manager.thrift.ManagerGoalState;
 import org.apache.accumulo.gc.SimpleGarbageCollector;
 import org.apache.accumulo.manager.Manager;
-import org.apache.accumulo.master.state.SetGoalState;
+import org.apache.accumulo.manager.state.SetGoalState;
 import org.apache.accumulo.server.init.Initialize;
 import org.apache.accumulo.shell.Shell;
 import org.apache.accumulo.tserver.TabletServer;
@@ -104,8 +106,39 @@ public class MAC {
     }
 
     /**
-     * Get an {@link Connector} for the specified user/password.
+     * Get an {@link AccumuloClient} for the 'root' user.
+     * </p>
+     * Note that if you change root's password, after starting
+     * this function will not work correctly.
+     * </p>
+     * @return An AccumuloClient for root
+     */
+    public AccumuloClient getRootClient() {
+        return getClient("root", new PasswordToken(config.getRootPassword()));
+    }
+
+    /**
+     * Get an {@link AccumuloClient} for the specified user/password.
+     * </p>
+     * @see Accumulo#newClient()
      *
+     * @param user - Accumulo username
+     * @param token - Accumulo username's password
+     * @return an Accumulo Client
+     */
+    public AccumuloClient getClient(String user, AuthenticationToken token) {
+        return Accumulo
+                .newClient()
+                .to(getInstanceName(), getZooKeepers())
+                .as(user, token)
+                .build();
+    }
+
+    /**
+     * Deprecated. Use {@link #getClient(String, AuthenticationToken)} )} instead.
+     * <p>
+     * Get an {@link Connector} for the specified user/password.
+     * </p>
      * @see ZooKeeperInstance#getConnector(String, AuthenticationToken)
      * @param user - Accumulo username
      * @param token - Accumulo username's password
@@ -113,14 +146,17 @@ public class MAC {
      * @throws AccumuloException if something unexpected goes wrong.
      * @throws AccumuloSecurityException If there is an auth problem.
      */
+    @Deprecated(since = "2.1.3")
     public Connector getConnector(String user, AuthenticationToken token) throws AccumuloException, AccumuloSecurityException {
         Instance instance = new ZooKeeperInstance(getClientConfig());
         return instance.getConnector(user, token);
     }
 
     /**
-     * Get an {@link Connector} for the 'root' user.
+     * Deprecated. Use {@link #getRootClient()} instead.
      * <p>
+     * Get an {@link Connector} for the 'root' user.
+     * </p>
      * Note that if you change root's password, after starting
      * this function will not work correctly.
      * </p>
@@ -128,10 +164,12 @@ public class MAC {
      * @throws AccumuloException if something unexpected goes wrong.
      * @throws AccumuloSecurityException If there is an auth problem.
      */
+    @Deprecated(since = "2.1.3")
     public Connector getRootConnector() throws AccumuloException, AccumuloSecurityException {
         return getConnector("root", new PasswordToken(config.getRootPassword()));
     }
 
+    @Deprecated
     private ClientConfiguration getClientConfig() {
         return ClientConfiguration
                 .fromMap(config.getSiteConfig())

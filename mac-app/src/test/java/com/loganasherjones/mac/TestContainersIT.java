@@ -1,7 +1,5 @@
 package com.loganasherjones.mac;
 
-import org.apache.accumulo.core.client.Connector;
-import org.apache.accumulo.core.client.Instance;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -29,9 +27,13 @@ public class TestContainersIT {
 
     @Test
     public void testTestContainers() throws Exception {
-        Instance instance = TestHelper.getInstance("default", mac.getHost(), mac.getFirstMappedPort());
-        Connector rootConnector = TestHelper.getRootConnector(instance);
-        TestClient client = new TestClient(instance, rootConnector);
+        TestClient client = new TestClient(
+                "default",
+                mac.getHost(),
+                mac.getFirstMappedPort(),
+                "notsecure",
+                false
+        );
         client.runTest();
     }
 
