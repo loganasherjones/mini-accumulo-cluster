@@ -12,7 +12,7 @@ repositories {
 }
 
 val accumuloVersion = project.property("accumuloVersion").toString()
-version = "${accumuloVersion}-1"
+version = "${accumuloVersion}-2-SNAPSHOT"
 
 mkdocs {
     sourcesDir = "."
