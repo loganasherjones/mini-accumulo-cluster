@@ -59,6 +59,7 @@ val buildImageTask by tasks.creating(DockerBuildImage::class) {
     dependsOn("distTar")
     dependsOn("compileTestJava")
     dependsOn("processTestResources")
+    dependsOn("distZip")
     buildArgs = mapOf("PROJECT_VERSION" to  projectVersion)
     inputDir = file(project.projectDir)
     images.add("loganasherjones/mini-accumulo-cluster:${projectVersion}")
