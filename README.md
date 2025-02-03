@@ -11,15 +11,8 @@ This project is an attempt to address these shortcomings. The main focus of
 this project is to provide an Accumulo cluster that can be used for integration
 testing.
 
-At the moment, only 1.10.X is supported with the intent of supporting 2.X in
-the future.
-
 See [Project Documentation](https://loganasherjones.github.io/mini-accumulo-cluster/)
 for full details on usage.
-
-## TODOS:
-
-- [ ] Create 2.X Version
 
 ## Releasing
 
