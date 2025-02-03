@@ -1,0 +1,13 @@
+<configuration>
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%p %d{ISO8601} %r %c [%t] %m%n</pattern>
+        </encoder>
+    </appender>
+    <logger name="com.loganasherjones.mac" level="INFO" additivity="false">
+        <appender-ref ref="console"/>
+    </logger>
+    <root level="ERROR">
+        <appender-ref ref="console"/>
+    </root>
+</configuration>

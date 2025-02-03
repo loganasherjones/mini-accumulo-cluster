@@ -1,7 +1,5 @@
 package com.loganasherjones.mac;
 
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.impl.VFSClassLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,12 +64,6 @@ public class DefaultClasspathLoader implements ClasspathLoader {
                         append(classpathBuilder, u);
                     }
 
-                } else if (classLoader instanceof VFSClassLoader) {
-
-                    VFSClassLoader vcl = (VFSClassLoader) classLoader;
-                    for (FileObject f : vcl.getFileObjects()) {
-                        append(classpathBuilder, f.getURL());
-                    }
                 } else {
                     if (classLoader.getClass().getName()
                             .equals("jdk.internal.loader.ClassLoaders$AppClassLoader")) {

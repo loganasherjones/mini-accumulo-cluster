@@ -1,6 +1,5 @@
 package com.loganasherjones.mac;
 
-import org.apache.accumulo.server.util.time.SimpleTimer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +10,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * A class for writing logs from a subprocess.
@@ -27,6 +28,7 @@ public class LogWriter extends Thread {
     private static final Logger log = LoggerFactory.getLogger(LogWriter.class);
 
     private final BufferedReader in;
+    private final Timer timer;
     private BufferedWriter out;
     private final boolean safeToClose;
 
@@ -51,18 +53,21 @@ public class LogWriter extends Thread {
         safeToClose = out != System.err && out != System.out;
         this.in = new BufferedReader(new InputStreamReader(in));
         this.out = new BufferedWriter(new OutputStreamWriter(out));
+        this.timer = new Timer();
     }
 
     private void flushEverySecond() {
-        SimpleTimer.getInstance(null).schedule(
-                () -> {
-                    try {
-                        flush();
-                    } catch (IOException e) {
-                        log.error("Unexpected IOException during flush", e);
-                    }
-                },
-                1000, 1000);
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    flush();
+                } catch (IOException e) {
+                    log.error("Unexpected IOException during flush", e);
+                }
+            }
+        };
+        timer.schedule(task, 1000, 1000);
     }
 
     /**
@@ -93,6 +98,8 @@ public class LogWriter extends Thread {
                 out.append("\n");
             }
 
+            timer.cancel();
+            timer.purge();
             synchronized (this) {
                 if (safeToClose) {
                     out.close();

@@ -276,18 +276,14 @@ public class MACConfig {
             fw.close();
         }
 
-        File siteXml = new File(configDirectory, "accumulo-site.xml");
-        if (!siteXml.exists()) {
-            FileWriter fileWriter = new FileWriter(siteXml);
-            fileWriter.append("<configuration>").append(System.lineSeparator());
+        File accumuloPropsFile = new File(configDirectory, "accumulo.properties");
+        if (!accumuloPropsFile.exists()) {
+            FileWriter fileWriter = new FileWriter(accumuloPropsFile);
+            Properties accumuloProps = new Properties();
             for (Map.Entry<String, String> item : siteConfig.entrySet()) {
-                String escapedValue = escapeXmlString(item.getValue());
-                fileWriter.append("  <property>").append(System.lineSeparator());
-                fileWriter.append("    <name>").append(item.getKey()).append("</name>").append(System.lineSeparator());
-                fileWriter.append("    <value>").append(escapedValue).append("</value>").append(System.lineSeparator());
-                fileWriter.append("  </property>").append(System.lineSeparator());
+                accumuloProps.setProperty(item.getKey(), item.getValue());
             }
-            fileWriter.append("</configuration>").append(System.lineSeparator());
+            accumuloProps.store(fileWriter, null);
             fileWriter.close();
         }
     }

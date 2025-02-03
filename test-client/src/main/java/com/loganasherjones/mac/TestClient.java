@@ -30,42 +30,54 @@ public class TestClient {
     private final String user1Password = "password1";
     private final ColumnVisibility aOrB = new ColumnVisibility("A|B");
     private final ColumnVisibility aAndB = new ColumnVisibility("A&B");
-    private final Connector rootConnector;
-    private final Instance instance;
+    private final String instanceName;
+    private final String zookeeperHost;
+    private final String rootPassword;
+    private final int zookeeperPort;
     private final boolean skipIteratorTest;
+    private final AccumuloClient rootClient;
 
-    public TestClient(Instance instance, Connector rootConnector) {
-        this(instance, rootConnector, false);
-    }
-
-    public TestClient(Instance instance, Connector rootConnector, boolean skipIteratorTest) {
-        this.instance = instance;
-        this.rootConnector = rootConnector;
+    public TestClient(
+            String instanceName,
+            String zookeeperHost,
+            int zookeeperPort,
+            String rootPassword,
+            boolean skipIteratorTest
+    ) {
+        this.instanceName = instanceName;
+        this.zookeeperHost = zookeeperHost;
+        this.zookeeperPort = zookeeperPort;
+        this.rootPassword = rootPassword;
+        this.rootClient = createRootClient();
         this.skipIteratorTest = skipIteratorTest;
     }
 
     public void runTest() throws Exception {
         cleanup();
+        AccumuloClient userClient = null;
         try {
-            setupTablesUsersAndPermissions(rootConnector);
-            Connector userConnector = instance.getConnector(user1, new PasswordToken(user1Password));
-            insertData(userConnector);
-            checkScans(userConnector);
+            setupTablesUsersAndPermissions(rootClient);
+            userClient = createClientWithRetry(zookeeperHost, zookeeperPort, user1, user1Password);
+            insertData(userClient);
+            checkScans(userClient);
             log.info("Test successful.");
         } finally {
+            if (userClient != null) {
+                userClient.close();
+            }
             cleanup();
         }
     }
 
     private void cleanup() throws Exception {
         try {
-            rootConnector.tableOperations().delete(table);
+            rootClient.tableOperations().delete(table);
         } catch (TableNotFoundException e) {
             // No worries.
         }
 
         try {
-            rootConnector.securityOperations().dropLocalUser(user1);
+            rootClient.securityOperations().dropLocalUser(user1);
         } catch (AccumuloSecurityException e) {
             if (e.getSecurityErrorCode() != SecurityErrorCode.USER_DOESNT_EXIST) {
                 throw e;
@@ -74,27 +86,27 @@ public class TestClient {
 
     }
 
-    private void setupTablesUsersAndPermissions(Connector conn) throws Exception {
+    private void setupTablesUsersAndPermissions(AccumuloClient client) throws Exception {
         log.info("Creating table: {}", table);
-        conn.tableOperations().create(table, new NewTableConfiguration());
+        client.tableOperations().create(table, new NewTableConfiguration());
 
         log.info("Creating user: {}", user1);
-        conn.securityOperations().createLocalUser(user1, new PasswordToken(user1Password));
-        conn.securityOperations().changeUserAuthorizations(user1, new Authorizations("A", "B"));
-        conn.securityOperations().grantTablePermission(user1, table, TablePermission.READ);
-        conn.securityOperations().grantTablePermission(user1, table, TablePermission.WRITE);
+        client.securityOperations().createLocalUser(user1, new PasswordToken(user1Password));
+        client.securityOperations().changeUserAuthorizations(user1, new Authorizations("A", "B"));
+        client.securityOperations().grantTablePermission(user1, table, TablePermission.READ);
+        client.securityOperations().grantTablePermission(user1, table, TablePermission.WRITE);
 
         log.info("Attaching iterator to: {}", table);
         IteratorSetting is = new IteratorSetting(10, SummingCombiner.class);
         SummingCombiner.setEncodingType(is, LongCombiner.Type.STRING);
         IteratorSetting.Column countColumn = new IteratorSetting.Column("META", "COUNT");
         SummingCombiner.setColumns(is, Collections.singletonList(countColumn));
-        conn.tableOperations().attachIterator(table, is);
+        client.tableOperations().attachIterator(table, is);
     }
 
-    private void insertData(Connector conn) throws Exception {
+    private void insertData(AccumuloClient client) throws Exception {
         log.info("Inserting data");
-        BatchWriter bw = conn.createBatchWriter(table, new BatchWriterConfig());
+        BatchWriter bw = client.createBatchWriter(table, new BatchWriterConfig());
         UUID uuid = UUID.randomUUID();
 
         Mutation m = new Mutation(uuid.toString());
@@ -115,10 +127,10 @@ public class TestClient {
         bw.close();
     }
 
-    private void checkScans(Connector conn) throws Exception {
+    private void checkScans(AccumuloClient client) throws Exception {
         log.info("Ensuring scans work as expected.");
         int count = 0;
-        Scanner scanner = conn.createScanner(table, new Authorizations("A"));
+        Scanner scanner = client.createScanner(table, new Authorizations("A"));
         for (Map.Entry<Key, Value> entry : scanner) {
             if (entry.getKey().getColumnQualifierData().toString().equals("COUNT")) {
                 assertEquals("2", entry.getValue().toString());
@@ -136,7 +148,7 @@ public class TestClient {
         assertEquals(3, count);
 
         count = 0;
-        scanner = conn.createScanner(table, new Authorizations("A", "B"));
+        scanner = client.createScanner(table, new Authorizations("A", "B"));
         for (Map.Entry<Key, Value> entry : scanner) {
             if (entry.getKey().getColumnQualifierData().toString().equals("IMG")) {
                 assertEquals("ABCDEFGH", entry.getValue().toString());
@@ -150,16 +162,16 @@ public class TestClient {
         // Iterator Testing
         if (!skipIteratorTest) {
             try {
-                customIteratorScan(conn);
+                customIteratorScan(client);
             } catch (Exception e) {
                 fail("Error occurred during iterator-base scanning: " + e.getMessage());
             }
         }
     }
 
-    private void customIteratorScan(Connector conn) throws Exception {
+    private void customIteratorScan(AccumuloClient client) throws Exception {
         log.info("Testing custom iterator scanning.");
-        Scanner scanner = conn.createScanner(table, new Authorizations("A", "B"));
+        Scanner scanner = client.createScanner(table, new Authorizations("A", "B"));
         IteratorSetting exampleIteratorSetting = new IteratorSetting(11, "example", "com.loganasherjones.mac.ExampleIterator");
         scanner.addScanIterator(exampleIteratorSetting);
         int count = 0;
@@ -168,5 +180,51 @@ public class TestClient {
         }
         assertEquals(0, count);
         scanner.close();
+    }
+
+    private AccumuloClient createRootClient() {
+        try {
+            return createClientWithRetry(
+                    zookeeperHost,
+                    zookeeperPort,
+                    "root",
+                    rootPassword
+                );
+        } catch (InterruptedException e) {
+            fail("Interrupted trying to get Accumulo client");
+        } catch (RuntimeException e) {
+            fail("Could not successfully connect to Accumulo");
+        }
+        throw new RuntimeException("Unhandled case failing to get Accumulo Client.");
+    }
+
+    private AccumuloClient createClientWithRetry(
+            String zookeeperHost,
+            int zookeeperPort,
+            String username,
+            String password
+    ) throws InterruptedException {
+        String zookeeperConnect = zookeeperHost + ":" + zookeeperPort;
+        AccumuloClient client = null;
+        long startTime = System.currentTimeMillis();
+
+        RuntimeException lastException = new RuntimeException("You shouldn't see this.");
+        while (client == null && System.currentTimeMillis() - startTime < 60_000) {
+            try {
+                client = Accumulo
+                        .newClient()
+                        .to(instanceName, zookeeperConnect)
+                        .as(username, new PasswordToken(password))
+                        .build();
+            } catch (RuntimeException e) {
+                log.debug("Could not connect to zookeeper, sleeping for one second", e);
+                Thread.sleep(1000);
+                lastException = e;
+            }
+        }
+        if (client == null) {
+            throw lastException;
+        }
+        return client;
     }
 }

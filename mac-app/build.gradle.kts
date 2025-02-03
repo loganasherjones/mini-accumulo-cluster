@@ -31,9 +31,7 @@ val accumuloVersion = project.property("accumuloVersion").toString()
 
 dependencies {
     implementation(project(":library"))
-//    implementation("ch.qos.reload4j:reload4j:1.2.22")
-    testImplementation("org.apache.accumulo:accumulo-core:${accumuloVersion}")
-    testImplementation("org.slf4j:slf4j-api:1.7.36")
+    runtimeOnly("ch.qos.logback:logback-classic:1.5.1")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation(project(":test-client"))

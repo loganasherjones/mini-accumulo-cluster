@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%p %d{ISO8601} %r %c [%t] %m%n</pattern>
+        </encoder>
+    </appender>
+    <logger name="com.loganasherjones.mac" level="${mac_log_level}"/>
+    <root level="${root_log_level}">
+        <appender-ref ref="stdout"/>
+    </root>
+</configuration>

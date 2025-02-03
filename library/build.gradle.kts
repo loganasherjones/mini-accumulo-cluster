@@ -16,26 +16,27 @@ repositories {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 val accumuloVersion = project.property("accumuloVersion").toString()
+val zookeeperVersion = project.property("zookeeperVersion").toString()
 
 dependencies {
     implementation("org.apache.accumulo:accumulo-core:${accumuloVersion}")
     implementation("org.apache.accumulo:accumulo-gc:${accumuloVersion}")
-    implementation("org.apache.accumulo:accumulo-master:${accumuloVersion}")
+    implementation("org.apache.accumulo:accumulo-manager:${accumuloVersion}")
     implementation("org.apache.accumulo:accumulo-server-base:${accumuloVersion}")
     implementation("org.apache.accumulo:accumulo-shell:${accumuloVersion}")
     implementation("org.apache.accumulo:accumulo-tserver:${accumuloVersion}")
-    implementation("org.apache.commons:commons-vfs2:2.3")
-    implementation("org.apache.zookeeper:zookeeper:3.7.2")
-    implementation("org.slf4j:slf4j-api:1.7.36")
-    runtimeOnly("io.dropwizard.metrics:metrics-core:4.2.29")
+    implementation("org.apache.zookeeper:zookeeper:${zookeeperVersion}")
+    implementation("org.slf4j:slf4j-api:2.0.16")
+    runtimeOnly("io.dropwizard.metrics:metrics-core:4.2.30")
 
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testRuntimeOnly("ch.qos.logback:logback-classic:1.5.1")
     testImplementation(project(":test-client"))
     testRuntimeOnly(project(":test-iterator"))
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
