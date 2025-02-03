@@ -50,7 +50,7 @@ public class MyTest {
         cluster.start();
         
         // Get a connector for the 'root' user.
-        Connector rootConnector = cluster.getRootConnector();
+        AccumuloClient rootClient = cluster.getRootClient();
         
         // TODO: Insert your test code here.
         
@@ -87,8 +87,8 @@ public class MyTest {
 }
 ```
 
-One of the main goals of this project is to provide a way to programatically
+One of the main goals of this project is to provide a way to programmatically
 configure just about everything pertaining to the MAC. The `MACConfigBuilder`
 allows you to set any JVM property, for any/all processes, along with 
-controlling the `zoo.cfg` and `accumulo-site.xml` file. If you need more
+controlling the `zoo.cfg` and `accumulo.properties` file. If you need more
 customization, don't hesitate to open an issue.
