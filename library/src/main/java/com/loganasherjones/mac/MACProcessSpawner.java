@@ -90,7 +90,7 @@ public class MACProcessSpawner {
         List<String> argList = new ArrayList<>(Arrays.asList(javaBin, "-Dproc=" + processName, "-cp", classpath));
 
         for (Map.Entry<String, String> entry : jvmProperties.entrySet()) {
-            argList.add("-D" + entry.getKey() + "=" + entry.getValue());
+            argList.add(entry.getKey() + "=" + entry.getValue());
         }
 
         argList.add(className);

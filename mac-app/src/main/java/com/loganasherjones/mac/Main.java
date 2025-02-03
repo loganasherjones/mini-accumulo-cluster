@@ -57,7 +57,7 @@ public class Main {
             builder.withAccumuloBindAddress(InetAddress.getLocalHost().getHostAddress());
         }
 
-        builder.withGlobalJavaProperty("root_log_level", getRootLogLevel());
+        builder.withGlobalJavaProperty("-Droot_log_level", getRootLogLevel());
 
         String baseDir = System.getenv("MAC_BASE_DIR");
         if (baseDir != null && !baseDir.isEmpty()) {

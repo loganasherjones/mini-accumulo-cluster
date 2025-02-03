@@ -388,7 +388,7 @@ public class MACConfig {
         private final Map<String, String> zookeeperJvmProperties = initialZookeeperJvmProperties();
         private static Map<String, String> initialZookeeperJvmProperties() {
             Map<String, String> result = new HashMap<>();
-            result.put("zookeeper.jmx.log4j.disable", "true");
+            result.put("-Dzookeeper.jmx.log4j.disable", "true");
             return result;
         }
 
@@ -590,7 +590,7 @@ public class MACConfig {
          * max memory or other java settings.
          * </p>
          *
-         * @param key - A system property (without the -D)
+         * @param key - A system property
          * @param value - The value of the system property
          * @return this
          * @since 1.10.4
@@ -608,7 +608,7 @@ public class MACConfig {
          * affects the accumulo-site.xml. This is useful for doing things like
          * setting the max memory, or GC settings.
          * </p>
-         * @param key - A system property (without the -D)
+         * @param key - A system property
          * @param value - The value of the system property
          * @return this
          * @since 1.10.4
@@ -626,7 +626,7 @@ public class MACConfig {
          * affects the accumulo-site.xml. This is useful for doing things like
          * setting the max memory, or GC settings.
          * </p>
-         * @param key - A system property (without the -D)
+         * @param key - A system property
          * @param value - The value of the system property
          * @return this
          * @since 1.10.4
@@ -644,7 +644,7 @@ public class MACConfig {
          * affects the accumulo-site.xml. This is useful for doing things like
          * setting the max memory, or GC settings.
          * </p>
-         * @param key - A system property (without the -D)
+         * @param key - A system property
          * @param value - The value of the system property
          * @return this
          * @since 1.10.4
@@ -662,7 +662,7 @@ public class MACConfig {
          * affects the accumulo-site.xml. This is useful for doing things like
          * setting the max memory, or GC settings.
          * </p>
-         * @param key - A system property (without the -D)
+         * @param key - A system property
          * @param value - The value of the system property
          * @return this
          * @since 1.10.4
@@ -719,7 +719,7 @@ public class MACConfig {
         /**
          * Sets Java properties for spawned all spawned processes.
          *
-         * @param key - A system property (without the -D)
+         * @param key - A system property
          * @param value - The value of the system property
          * @return this
          * @since 1.10.4
